@@ -1,0 +1,120 @@
+"use client"
+
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { LogOut } from "lucide-react"
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator"
+import { CommonIcons } from "../common/common-icons"
+
+type SidebarItem = {
+  title: string
+  url: string
+  icon: string
+}
+
+type AppSidebarProps = {
+  logoSrc: string
+  menuItems: SidebarItem[]
+  user: {
+    name: string
+    role: string
+    avatar?: string
+  }
+  logoutPath?: string
+}
+
+export function AppSidebar({
+  logoSrc,
+  menuItems,
+  user,
+  logoutPath = "/login",
+}: AppSidebarProps) {
+  const router = useRouter()
+
+  return (
+    <Sidebar>
+      <SidebarHeader className="flex items-center justify-center py-4">
+        <Image
+          src={logoSrc}
+          alt="Logo"
+          width={140}
+          height={32}
+        />
+      </SidebarHeader>
+
+      <Separator />
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => {
+                const Icon = CommonIcons[item.icon]
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className="flex items-center gap-2"
+                      >
+                        {Icon && <Icon className="h-4 w-4" />}
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="p-4">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            {user.avatar ? (
+              <AvatarImage src={user.avatar} />
+            ) : (
+              <AvatarFallback>
+                {user.name.charAt(0)}
+              </AvatarFallback>
+            )}
+          </Avatar>
+
+          <div className="flex flex-col text-sm">
+            <span className="font-medium">{user.name}</span>
+            <span className="text-muted-foreground">
+              {user.role}
+            </span>
+          </div>
+        </div>
+
+        <SidebarMenu className="mt-3">
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push(logoutPath)}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  )
+}
