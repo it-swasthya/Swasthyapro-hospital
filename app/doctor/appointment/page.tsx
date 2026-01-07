@@ -1,8 +1,8 @@
 // import { AppointmentTable } from "@/components/doctor/appointment-table"
 
 import AppointmentTable from "@/components/doctor/appointment-table";
-import { appointmentData } from "@/app/data/appointment";
-import { Appointment } from "@/app/data/appointment";
+// import { appointmentData } from "@/app/data/appointment";
+// import { Appointment } from "@/app/data/appointment";
 
 export default function DoctorDashboardPage() {
   return (
@@ -11,7 +11,7 @@ export default function DoctorDashboardPage() {
 
       <div>
         <h2 className="text-lg font-semibold mb-2">
-          Recent Appointments
+          Appointment Scheduled by Hospital
         </h2>
         <AppointmentTable  />
       </div>

@@ -11,7 +11,7 @@ export default function DoctorDashboardPage() {
 
       <div>
         <h2 className="text-lg font-semibold mb-2">
-          Video Consult Request
+          Handle Appointment
         </h2>
         <VideoAppointmentTable />
       </div>

@@ -5,12 +5,12 @@ export const doctorSidebarItems = [
     icon: "home",
   },
   {
-    title: "Appointments",
+    title: "Assigned Appointments",
     url: "/doctor/appointment",
     icon: "notebook",
   },
   {
-    title: "Video Consult",
+    title: "Handle Video Consult",
     url: "/doctor/request",
     icon: "video",
   },

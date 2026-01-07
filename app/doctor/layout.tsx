@@ -16,7 +16,7 @@ export default function DoctorLayout({
           logoSrc="/logo-header.png"
           menuItems={doctorSidebarItems}
           user={{
-            name: "Dr. Rahul Sharma",
+            name: "Dr. Ashish Gupta",
             role: "General Physician",
             avatar: "https://i.pravatar.cc/100?img=12",
           }}
@@ -35,7 +35,7 @@ export default function DoctorLayout({
                   Welcome
                 </span> */}
                 <h1 className="text-2xl font-semibold">
-                  Welcome <span className="bg-green-200 p-4 rounded-b-3xl">Dr. Rahul Sharma</span>
+                  Welcome <span className="bg-green-200 p-4 rounded-b-3xl">Dr. Ashish Gupta</span>
                 </h1>
               </div>
             </div>

@@ -1,23 +1,24 @@
 // import { Appointment } from "@/types/appointment"
-
 export type AppointmentStatus =
-  | "Pending"
+  | "Allotted"
+  | "Scheduled"
   | "Completed"
   | "Cancelled"
-  | "Rescheduled"
 
 export type Appointment = {
   id: string
   patientName: string
+  contact: string
   symptoms: string
   speciality: string
   date: string
   timeSlot: string
   status: AppointmentStatus
   assignedDoctor?: string
-  mode:string
-  createdAt:string
+  mode: string
+  createdAt: string
 }
+
 
 
 export const appointmentData: Appointment[] = [
@@ -29,8 +30,9 @@ export const appointmentData: Appointment[] = [
     date: "2026-01-14",
     timeSlot: "10:00 AM - 10:15 AM",
     mode: "Video Consult",
-    status: "Pending",
+    status: "Allotted",
     createdAt: "2026-01-13",
+    contact:"989898989",
   },
   {
     id: "APT002",
@@ -42,6 +44,8 @@ export const appointmentData: Appointment[] = [
     mode: "Video Consult",
     status: "Completed",
     createdAt: "2026-01-13",
+        contact:"989898989",
+
   },
   {
     id: "APT003",
@@ -53,6 +57,8 @@ export const appointmentData: Appointment[] = [
     mode: "Video Consult",
     status: "Completed",
     createdAt: "2026-01-12",
+        contact:"989898989",
+
   },
   {
     id: "APT004",
@@ -62,8 +68,10 @@ export const appointmentData: Appointment[] = [
     date: "2026-01-15",
     timeSlot: "11:00 AM - 11:15 AM",
     mode: "Video Consult",
-    status: "Pending",
+    status: "Allotted",
     createdAt: "2026-01-14",
+        contact:"989898989",
+
   },
   {
     id: "APT005",
@@ -75,6 +83,8 @@ export const appointmentData: Appointment[] = [
     mode: "Video Consult",
     status: "Completed",
     createdAt: "2026-01-14",
+        contact:"989898989",
+
   },
 
   /* ---------- more realistic data ---------- */
@@ -87,8 +97,10 @@ export const appointmentData: Appointment[] = [
     date: "2026-01-15",
     timeSlot: "11:30 AM - 11:45 AM",
     mode: "Video Consult",
-    status: "Pending",
+    status: "Allotted",
     createdAt: "2026-01-14",
+        contact:"989898989",
+
   },
   {
     id: "APT007",
@@ -100,39 +112,8 @@ export const appointmentData: Appointment[] = [
     mode: "Video Consult",
     status: "Completed",
     createdAt: "2026-01-15",
-  },
-  {
-    id: "APT008",
-    patientName: "Kiran Kulkarni",
-    symptoms: "Persistent cough",
-    speciality: "Pulmonology",
-    date: "2026-01-16",
-    timeSlot: "12:15 PM - 12:30 PM",
-    mode: "Video Consult",
-    status: "Pending",
-    createdAt: "2026-01-15",
-  },
-  {
-    id: "APT009",
-    patientName: "Ananya Singh",
-    symptoms: "Anxiety, sleep issues",
-    speciality: "Psychiatry",
-    date: "2026-01-16",
-    timeSlot: "12:30 PM - 12:45 PM",
-    mode: "Video Consult",
-    status: "Completed",
-    createdAt: "2026-01-15",
-  },
-  {
-    id: "APT010",
-    patientName: "Vikas Gupta",
-    symptoms: "Abdominal pain",
-    speciality: "Gastroenterology",
-    date: "2026-01-17",
-    timeSlot: "01:00 PM - 01:15 PM",
-    mode: "Video Consult",
-    status: "Cancelled",
-    createdAt: "2026-01-16",
+        contact:"989898989",
+
   },
 
   /* ---- you can extend similarly up to 30+ ---- */

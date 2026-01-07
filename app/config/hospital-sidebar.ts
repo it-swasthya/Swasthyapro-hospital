@@ -1,9 +1,3 @@
-import {
-  Home,
-  Calendar,
-  Users,
-  Settings,
-} from "lucide-react"
 
 export const hospitalSidebarItems = [
   {
@@ -11,9 +5,9 @@ export const hospitalSidebarItems = [
     url: "/hospital/dashboard",
     icon: "home",
   },
-  {
+   {
     title: "Appointments",
-    url: "/hospital/appointment",
+    url: "/hospital/mashh",
     icon: "calendar",
   },
   {
