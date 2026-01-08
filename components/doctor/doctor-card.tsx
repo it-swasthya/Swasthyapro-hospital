@@ -59,10 +59,10 @@ export function DoctorCard({ doctor }: { doctor: DoctorCardType }) {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2">
                     <div className="rounded-md bg-muted p-3 text-center">
                         <p className="text-xs text-muted-foreground">
-                            Completed
+                            Total Consult
                         </p>
                         <p className="text-lg font-semibold">
                             {doctor.completedAppointments}
@@ -72,6 +72,22 @@ export function DoctorCard({ doctor }: { doctor: DoctorCardType }) {
                     <div className="rounded-md bg-muted p-3 text-center">
                         <p className="text-xs text-muted-foreground">
                             Pending
+                        </p>
+                        <p className="text-lg font-semibold">
+                            {doctor.pendingAppointments}
+                        </p>
+                    </div>
+                      <div className="rounded-md bg-muted p-3 text-center">
+                        <p className="text-xs text-muted-foreground">
+                            Rejected
+                        </p>
+                        <p className="text-lg font-semibold">
+                            {doctor.pendingAppointments}
+                        </p>
+                    </div>
+                      <div className="rounded-md bg-muted p-3 text-center">
+                        <p className="text-xs text-muted-foreground">
+                            Accepted
                         </p>
                         <p className="text-lg font-semibold">
                             {doctor.pendingAppointments}

@@ -1,13 +1,33 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import * as React from "react"
 import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_ColumnDef,
-} from "material-react-table"
-import { Chip } from "@mui/material"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { Appointment } from "@/app/data/appointment"
 
@@ -21,22 +41,48 @@ const DOCTORS = [
   "Dr. Pooja Singh",
 ]
 
+const statusVariant = (status: string) => {
+  switch (status) {
+    case "Allotted":
+      return "success"
+    case "Scheduled":
+      return "warning"
+    case "Completed":
+      return "info"
+    default:
+      return "destructive"
+  }
+}
+
 const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
-  const [tableData, setTableData] = useState<Appointment[]>(data)
+  const [tableData, setTableData] = React.useState<Appointment[]>(data)
+  const [sorting, setSorting] = React.useState<any>([])
 
   /* ============================
-      TABLE COLUMNS
+      COLUMNS
   ============================ */
-  const columns = useMemo<MRT_ColumnDef<Appointment>[]>(
+  const columns = React.useMemo<ColumnDef<Appointment>[]>(
     () => [
-      { accessorKey: "patientName", header: "Patient Name" },
-      { accessorKey: "contact", header: "Contact" },
-      { accessorKey: "symptoms", header: "Symptoms" },
-      { accessorKey: "speciality", header: "Speciality" },
+      {
+        accessorKey: "patientName",
+        header: "Patient Name",
+      },
+      {
+        accessorKey: "contact",
+        header: "Contact",
+      },
+      {
+        accessorKey: "symptoms",
+        header: "Symptoms",
+      },
+      {
+        accessorKey: "speciality",
+        header: "Speciality",
+      },
       {
         accessorKey: "assignedDoctor",
         header: "Doctor",
-        Cell: ({ row }) => {
+        cell: ({ row }) => {
           const appointment = row.original
 
           return (
@@ -56,7 +102,7 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
                 )
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-45">
                 <SelectValue placeholder="Assign Doctor" />
               </SelectTrigger>
               <SelectContent>
@@ -70,27 +116,23 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
           )
         },
       },
-      { accessorKey: "date", header: "Date" },
-      { accessorKey: "timeSlot", header: "Time Slot" },
+      {
+        accessorKey: "date",
+        header: "Date",
+      },
+      {
+        accessorKey: "timeSlot",
+        header: "Time Slot",
+      },
       {
         accessorKey: "status",
         header: "Status",
-        Cell: ({ cell }) => {
-          const status = cell.getValue<string>()
+        cell: ({ getValue }) => {
+          const status = getValue<string>()
           return (
-            <Chip
-              label={status}
-              size="small"
-              color={
-                status === "Allotted"
-                  ? "success"
-                  : status === "Scheduled"
-                  ? "warning"
-                  : status === "Completed"
-                  ? "info"
-                  : "error"
-              }
-            />
+            <Badge variant={statusVariant(status) as any}>
+              {status}
+            </Badge>
           )
         },
       },
@@ -101,15 +143,93 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
   /* ============================
       TABLE INSTANCE
   ============================ */
-  const table = useMaterialReactTable({
-    columns,
+  const table = useReactTable({
     data: tableData,
-    enableSorting: true,
-    enablePagination: true,
-    enableColumnActions: false,
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   })
 
-  return <MaterialReactTable table={table} />
+  return (
+    <div className="space-y-4 mt-6">
+      {/* TABLE */}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="cursor-pointer"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                    {{
+                      asc: " 🔼",
+                      desc: " 🔽",
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No appointments found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* PAGINATION */}
+      <div className="flex items-center justify-end gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 export default HospitalAppointmentTable
