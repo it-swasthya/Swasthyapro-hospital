@@ -1,26 +1,76 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Mail, ShieldCheck, HelpCircle } from "lucide-react"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Mail, ShieldCheck, HelpCircle } from "lucide-react";
+
+import { loginDoctor, loginHospital } from "@/app/lib/auth";
 
 export default function LoginTabs() {
-  const router = useRouter()
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [doctor, setDoctor] = useState({
+    email: "",
+    password: "",
+    secretKey: "",
+
+  });
+
+  const [hospital, setHospital] = useState({
+    email: "",
+    password: "",
+    secretKey: "",
+  });
+
+  const handleDoctorLogin = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await loginDoctor(doctor);
+      localStorage.setItem("accessToken", res.accessToken);
+
+      router.push("/doctor/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Doctor login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleHospitalLogin = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await loginHospital(hospital);
+      localStorage.setItem("accessToken", res.accessToken);
+
+      router.push("/hospital/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Hospital login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Tabs defaultValue="doctor" className="w-full">
@@ -29,7 +79,13 @@ export default function LoginTabs() {
         <TabsTrigger value="hospital">Hospital</TabsTrigger>
       </TabsList>
 
-      {/* ================= Doctor ================= */}
+      {error && (
+        <div className="mb-4 text-sm text-red-600 text-center">
+          {error}
+        </div>
+      )}
+
+      {/* Doctor */}
       <TabsContent value="doctor">
         <Card className="border-none shadow-none p-4">
           <CardHeader className="px-0">
@@ -37,57 +93,59 @@ export default function LoginTabs() {
           </CardHeader>
 
           <CardContent className="space-y-6 px-0">
-            {/* Form */}
             <div className="space-y-4">
-              <div className="space-y-1">
+              <div>
                 <Label>Email</Label>
-                <Input placeholder="doctor@email.com" />
+                <Input
+                  placeholder="doctor@email.com"
+                  value={doctor.email}
+                  onChange={(e) =>
+                    setDoctor({ ...doctor, email: e.target.value })
+                  }
+                />
               </div>
 
-              <div className="space-y-1">
+              <div>
                 <Label>Password</Label>
-                <Input type="password" placeholder="••••••••" />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={doctor.password}
+                  onChange={(e) =>
+                    setDoctor({ ...doctor, password: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <Label>Secret Key</Label>
+                <Input
+                  placeholder="Enter hospital secret key"
+                  value={doctor.secretKey}
+                  onChange={(e) =>
+                    setDoctor({
+                      ...doctor,
+                      secretKey: e.target.value,
+                    })
+                  }
+
+                />
               </div>
 
               <Button
                 className="w-full bg-green-600 hover:bg-green-700"
-                onClick={() => router.push("/doctor/dashboard")}
+                disabled={loading}
+                onClick={handleDoctorLogin}
               >
-                Login as Doctor
+                {loading ? "Logging in..." : "Login as Doctor"}
               </Button>
             </div>
 
-            {/* Help */}
-            <div className="text-sm text-muted-foreground space-y-2">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" />
-                <span>
-                  Can’t remember your credentials?
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                <span>
-                  Contact the SwasthyaPro support team
-                </span>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Security note */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="h-4 w-4" />
-              <span>
-                Your login is secured with industry-standard encryption.
-              </span>
-            </div>
+            <HelpBlock />
           </CardContent>
         </Card>
       </TabsContent>
 
-      {/* ================= Hospital ================= */}
+      {/* Hospital */}
       <TabsContent value="hospital">
         <Card className="border-none shadow-none p-4">
           <CardHeader className="px-0">
@@ -95,56 +153,83 @@ export default function LoginTabs() {
           </CardHeader>
 
           <CardContent className="space-y-6 px-0">
-            {/* Form */}
             <div className="space-y-4">
-              <div className="space-y-1">
+              <div>
                 <Label>Email</Label>
-                <Input placeholder="hospital@email.com" />
+                <Input
+                  placeholder="hospital@email.com"
+                  value={hospital.email}
+                  onChange={(e) =>
+                    setHospital({ ...hospital, email: e.target.value })
+                  }
+                />
               </div>
 
-              <div className="space-y-1">
+              <div>
                 <Label>Password</Label>
-                <Input type="password" placeholder="••••••••" />
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={hospital.password}
+                  onChange={(e) =>
+                    setHospital({ ...hospital, password: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label>Secret Key</Label>
+                <Input
+                  placeholder="Enter hospital secret key"
+                  value={hospital.secretKey}
+                  onChange={(e) =>
+                    setHospital({
+                      ...hospital,
+                      secretKey: e.target.value,
+                    })
+                  }
+                />
               </div>
 
               <Button
-                className="w-full"
                 variant="destructive"
-                onClick={() => router.push("/hospital/dashboard")}
+                className="w-full"
+                disabled={loading}
+                onClick={handleHospitalLogin}
               >
-                Login as Hospital
+                {loading ? "Logging in..." : "Login as Hospital"}
               </Button>
             </div>
 
-            {/* Help */}
-            <div className="text-sm text-muted-foreground space-y-2">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" />
-                <span>
-                  Trouble accessing your hospital account?
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                <span>
-                  Reach out to SwasthyaPro support
-                </span>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Security note */}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="h-4 w-4" />
-              <span>
-                Hospital data is protected under strict security standards.
-              </span>
-            </div>
+            <HelpBlock />
           </CardContent>
         </Card>
       </TabsContent>
     </Tabs>
-  )
+  );
+}
+
+function HelpBlock() {
+  return (
+    <>
+      <div className="text-sm text-muted-foreground space-y-2">
+        <div className="flex items-center gap-2">
+          <HelpCircle className="h-4 w-4" />
+          <span>Need help logging in?</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4" />
+          <span>Contact SwasthyaPro support</span>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <ShieldCheck className="h-4 w-4" />
+        <span>Your login is securely encrypted.</span>
+      </div>
+    </>
+  );
 }
