@@ -29,17 +29,16 @@ import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment"
 
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogPortal,   // ✅ ADD THIS
 
+} from "@/components/ui/dialog"
+import AppointmentDialog from "./appointment/AppointmentDialog"
 
 
 /* ============================
@@ -66,25 +65,37 @@ const AppointmentTable = () => {
     /* dialog state */
     const [open, setOpen] = React.useState(false)
     const [action, setAction] = React.useState<"accept" | "reject" | null>(null)
-    const [selectedId, setSelectedId] = React.useState<string | null>(null)
+
+    // const [selectedId, setSelectedId] = React.useState<string | null>(null)
+    const [selectedAppointment, setSelectedAppointment] =
+        React.useState<Appointment | null>(null)
+
 
     /* ============================
        FETCH DATA
     ============================ */
     React.useEffect(() => {
+        let isMounted = true
+
         const loadData = async () => {
             try {
                 const res = await getAllAppointmentDoctorLists()
+                if (!isMounted) return
+
                 const mappedData = mapApiAppointmentToUI(res.allAppointments)
                 setData(mappedData)
             } catch (error) {
                 console.error(error)
             } finally {
-                setLoading(false)
+                if (isMounted) setLoading(false)
             }
         }
 
         loadData()
+
+        return () => {
+            isMounted = false
+        }
     }, [])
 
     /* ============================
@@ -130,28 +141,14 @@ const AppointmentTable = () => {
 
                     return (
                         <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                onClick={() => {
-                                    setSelectedId(id)
-                                    setAction("accept")
-                                    setOpen(true)
-                                }}
-                            >
+                            <Button size="sm" onClick={() => openDialog(row.original, "accept")}>
                                 Accept
                             </Button>
 
-                            <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => {
-                                    setSelectedId(id)
-                                    setAction("reject")
-                                    setOpen(true)
-                                }}
-                            >
+                            <Button variant="destructive" onClick={() => openDialog(row.original, "reject")}>
                                 Reject
                             </Button>
+
                         </div>
                     )
                 },
@@ -159,6 +156,12 @@ const AppointmentTable = () => {
         ],
         []
     )
+    const openDialog = (appointment: Appointment, type: "accept" | "reject") => {
+        setSelectedAppointment(appointment)
+        setAction(type)
+        setOpen(true)
+    }
+
 
     /* ============================
        TABLE INSTANCE
@@ -183,6 +186,22 @@ const AppointmentTable = () => {
             </div>
         )
     }
+    const handleConfirm = () => {
+        if (!selectedAppointment || !action) return
+
+        // 1️⃣ Do all updates FIRST
+        handleUpdateStatus(
+            selectedAppointment.id,
+            action === "accept" ? "Accepted" : "Rejected"
+        )
+
+        setSelectedAppointment(null)
+        setAction(null)
+
+        // 2️⃣ Close dialog LAST
+        setOpen(false)
+    }
+
 
     return (
         <>
@@ -257,54 +276,20 @@ const AppointmentTable = () => {
                         Next
                     </Button>
                 </div>
+                <AppointmentDialog
+                    open={open}
+                    setOpen={setOpen}
+                    action={action}
+                    selectedAppointment={selectedAppointment}
+                    handleConfirm={handleConfirm}
+                />
+
+
             </div>
 
-            <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogContent
-                    className="
-      fixed
-      left-1/2
-      top-1/2
-      -translate-x-1/2
-      -translate-y-1/2
-      z-[9999]
-    "
-                >
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            {action === "accept"
-                                ? "Accept this appointment?"
-                                : "Reject this appointment?"}
-                        </AlertDialogTitle>
 
-                        <AlertDialogDescription>
-                            {action === "accept"
-                                ? "This will change the status to Scheduled."
-                                : "This action cannot be undone."}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
 
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => {
-                                if (!selectedId || !action) return
 
-                                handleUpdateStatus(
-                                    selectedId,
-                                    action === "accept" ? "Scheduled" : "Cancelled"
-                                )
-
-                                setOpen(false)
-                            }}
-                        >
-                            Confirm
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
-            
 
 
         </>

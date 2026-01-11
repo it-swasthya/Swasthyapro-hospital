@@ -19,6 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { CommonIcons } from "../common/common-icons"
+import router from "next/router"
 
 type SidebarItem = {
   title: string
@@ -37,6 +38,7 @@ type AppSidebarProps = {
   logoutPath?: string
 }
 
+
 export function AppSidebar({
   logoSrc,
   menuItems,
@@ -44,6 +46,22 @@ export function AppSidebar({
   logoutPath = "/login",
 }: AppSidebarProps) {
   const router = useRouter()
+  const handleLogout = () => {
+    // 1. Remove token from localStorage
+    localStorage.removeItem("accessToken");
+
+    // 2. Remove token cookie (middleware reads this)
+    document.cookie =
+      "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    // (optional) remove role if you store it
+    document.cookie =
+      "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    // 3. Redirect to login
+    router.push(logoutPath);
+  };
+
 
   return (
     <Sidebar>
@@ -106,14 +124,13 @@ export function AppSidebar({
 
         <SidebarMenu className="mt-3">
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => router.push(logoutPath)}
-            >
+            <SidebarMenuButton onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+
       </SidebarFooter>
     </Sidebar>
   )

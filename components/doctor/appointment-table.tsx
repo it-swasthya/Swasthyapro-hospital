@@ -22,6 +22,14 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+// import { SheetTitle } from "@/components/ui/sheet"
+
+import AllottedActions from "@/components/doctor/appointment/AllottedActions"
+import CompletedActions from "@/components/doctor/appointment/CompletedActions"
+
+
+
 
 import {
     Table,
@@ -60,6 +68,10 @@ const AppointmentTable = () => {
     const [data, setData] = React.useState<Appointment[]>([])
     const [loading, setLoading] = React.useState(true)
     const [sorting, setSorting] = React.useState<any>([])
+    const [openSheet, setOpenSheet] = React.useState(false)
+    const [selectedAppointment, setSelectedAppointment] =
+        React.useState<Appointment | null>(null)
+
 
     /* ============================
        FETCH DATA
@@ -120,12 +132,20 @@ const AppointmentTable = () => {
             {
                 id: "action",
                 header: "Action",
-                cell: () => (
-                    <Button size="sm" variant="outline">
+                cell: ({ row }) => (
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                            setSelectedAppointment(row.original)
+                            setOpenSheet(true)
+                        }}
+                    >
                         View
                     </Button>
                 ),
             },
+
         ],
         []
     )
@@ -225,35 +245,99 @@ const AppointmentTable = () => {
                 >
                     Next
                 </Button>
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <Button variant="outline">Open</Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Edit profile</SheetTitle>
-                            <SheetDescription>
-                                Make changes to your profile here. Click save when you&apos;re done.
-                            </SheetDescription>
-                        </SheetHeader>
-                        <div className="grid flex-1 auto-rows-min gap-6 px-4">
-                            <div className="grid gap-3">
-                                <Label htmlFor="sheet-demo-name">Name</Label>
-                                <Input id="sheet-demo-name" defaultValue="Pedro Duarte" />
-                            </div>
-                            <div className="grid gap-3">
-                                <Label htmlFor="sheet-demo-username">Username</Label>
-                                <Input id="sheet-demo-username" defaultValue="@peduarte" />
-                            </div>
+
+                <Sheet open={openSheet} onOpenChange={setOpenSheet} >
+                    <SheetContent className="w-[520px] sm:w-[480px] p-0">
+                        {/* HEADER */}
+                        <VisuallyHidden>
+                            <SheetTitle>Appointment Details</SheetTitle>
+                        </VisuallyHidden>
+                        <div className="border-b px-6 py-4">
+                            <h2 className="text-lg font-semibold">Appointment Details</h2>
+                            <p className="text-sm text-muted-foreground">
+                                Review patient information and take action
+                            </p>
                         </div>
-                        <SheetFooter>
-                            <Button type="submit">Save changes</Button>
-                            <SheetClose asChild>
-                                <Button variant="outline">Close</Button>
-                            </SheetClose>
-                        </SheetFooter>
+
+
+                        {selectedAppointment && (
+                            <div className="space-y-6 px-6 py-5">
+
+                                {/* PATIENT INFO */}
+                                <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-base font-medium">
+                                            {selectedAppointment.patientName}
+                                        </h3>
+
+                                        <Badge variant={statusVariant(selectedAppointment.status) as any}>
+                                            {selectedAppointment.status}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <p className="text-muted-foreground">Contact</p>
+                                            <p className="font-medium">{selectedAppointment.contact}</p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-muted-foreground">Date</p>
+                                            <p className="font-medium">{selectedAppointment.date}</p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-muted-foreground">Time Slot</p>
+                                            <p className="font-medium">{selectedAppointment.timeSlot}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* SYMPTOMS */}
+                                <div className="rounded-lg border p-4">
+                                    <p className="text-xs text-muted-foreground mb-1">Symptoms</p>
+                                    <p className="text-sm">{selectedAppointment.symptoms}</p>
+                                </div>
+
+                                {/* STATUS ACTIONS */}
+                                {selectedAppointment.status === "Allotted" && (
+                                    <AllottedActions
+                                        onAccept={() => {
+                                            console.log("Accept", selectedAppointment.id)
+                                            setOpenSheet(false)
+                                        }}
+                                        onReject={() => {
+                                            console.log("Reject", selectedAppointment.id)
+                                            setOpenSheet(false)
+                                        }}
+                                    />
+                                )}
+
+                                {selectedAppointment.status === "Completed" && (
+                                    <CompletedActions
+                                        onSubmit={(data) => {
+                                            console.log("Prescription Data", data)
+                                            setOpenSheet(false)
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* FOOTER */}
+                        <div className="border-t px-6 py-4">
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => setOpenSheet(false)}
+                            >
+                                Close
+                            </Button>
+                        </div>
                     </SheetContent>
                 </Sheet>
+
+
             </div>
 
         </div>

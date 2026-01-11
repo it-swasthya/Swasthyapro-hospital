@@ -39,14 +39,16 @@ export default function LoginTabs() {
     password: "",
     secretKey: "",
   });
-
   const handleDoctorLogin = async () => {
     try {
       setLoading(true);
       setError("");
 
       const res = await loginDoctor(doctor);
+
+      // ✅ store token
       localStorage.setItem("accessToken", res.accessToken);
+      document.cookie = `accessToken=${res.accessToken}; path=/;`;
 
       router.push("/doctor/dashboard");
     } catch (err: any) {
@@ -56,13 +58,17 @@ export default function LoginTabs() {
     }
   };
 
+
   const handleHospitalLogin = async () => {
     try {
       setLoading(true);
       setError("");
 
       const res = await loginHospital(hospital);
+
+      // ✅ store token
       localStorage.setItem("accessToken", res.accessToken);
+      document.cookie = `accessToken=${res.accessToken}; path=/;`;
 
       router.push("/hospital/dashboard");
     } catch (err: any) {
@@ -71,6 +77,7 @@ export default function LoginTabs() {
       setLoading(false);
     }
   };
+
 
   return (
     <Tabs defaultValue="doctor" className="w-full">

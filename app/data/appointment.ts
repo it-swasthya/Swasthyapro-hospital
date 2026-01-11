@@ -6,6 +6,7 @@ export type AppointmentStatus =
   | "Cancelled"
 
 export type Appointment = {
+  // appointment_id(arg0: string, appointment_id: any): unknown
   id: string
   patientName: string
   contact: string
@@ -21,100 +22,3 @@ export type Appointment = {
 
 
 
-export const appointmentData: Appointment[] = [
-  {
-    id: "APT001",
-    patientName: "Amit Sharma",
-    symptoms: "Fever, sore throat",
-    speciality: "General Medicine",
-    date: "2026-01-14",
-    timeSlot: "10:00 AM - 10:15 AM",
-    mode: "Video Consult",
-    status: "Allotted",
-    createdAt: "2026-01-13",
-    contact:"989898989",
-  },
-  {
-    id: "APT002",
-    patientName: "Neha Verma",
-    symptoms: "Chest pain, shortness of breath",
-    speciality: "Cardiology",
-    date: "2026-01-14",
-    timeSlot: "10:15 AM - 10:30 AM",
-    mode: "Video Consult",
-    status: "Completed",
-    createdAt: "2026-01-13",
-        contact:"989898989",
-
-  },
-  {
-    id: "APT003",
-    patientName: "Rahul Mehta",
-    symptoms: "Back pain, joint stiffness",
-    speciality: "Orthopedics",
-    date: "2026-01-14",
-    timeSlot: "10:30 AM - 10:45 AM",
-    mode: "Video Consult",
-    status: "Completed",
-    createdAt: "2026-01-12",
-        contact:"989898989",
-
-  },
-  {
-    id: "APT004",
-    patientName: "Sneha Iyer",
-    symptoms: "Headache, dizziness",
-    speciality: "Neurology",
-    date: "2026-01-15",
-    timeSlot: "11:00 AM - 11:15 AM",
-    mode: "Video Consult",
-    status: "Allotted",
-    createdAt: "2026-01-14",
-        contact:"989898989",
-
-  },
-  {
-    id: "APT005",
-    patientName: "Rohit Patel",
-    symptoms: "Skin rashes, itching",
-    speciality: "Dermatology",
-    date: "2026-01-15",
-    timeSlot: "11:15 AM - 11:30 AM",
-    mode: "Video Consult",
-    status: "Completed",
-    createdAt: "2026-01-14",
-        contact:"989898989",
-
-  },
-
-  /* ---------- more realistic data ---------- */
-
-  {
-    id: "APT006",
-    patientName: "Pooja Malhotra",
-    symptoms: "Irregular periods",
-    speciality: "Gynecology",
-    date: "2026-01-15",
-    timeSlot: "11:30 AM - 11:45 AM",
-    mode: "Video Consult",
-    status: "Allotted",
-    createdAt: "2026-01-14",
-        contact:"989898989",
-
-  },
-  {
-    id: "APT007",
-    patientName: "Suresh Reddy",
-    symptoms: "High blood sugar levels",
-    speciality: "Diabetology",
-    date: "2026-01-16",
-    timeSlot: "12:00 PM - 12:15 PM",
-    mode: "Video Consult",
-    status: "Completed",
-    createdAt: "2026-01-15",
-        contact:"989898989",
-
-  },
-
-  /* ---- you can extend similarly up to 30+ ---- */
-]
