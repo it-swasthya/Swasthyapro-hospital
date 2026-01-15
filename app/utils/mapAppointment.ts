@@ -14,6 +14,11 @@ export const mapApiAppointmentToUI = (
     status: item.status,
     assignedDoctor: item.doctor_allotted,
     mode: "Video Consult",
+    diagnosis: item.diagnosis,
+    doctor_advice: item.doctor_advice,
+    prescription_link: item.prescription_link,
     createdAt: item.createdAt,
+  
+
   }))
 }

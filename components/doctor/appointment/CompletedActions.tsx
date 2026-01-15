@@ -1,67 +1,75 @@
-"use client"
-
-import * as React from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { submitConsultationReport } from "@/app/services/appointment/appointment.service"
 
-interface CompletedActionsProps {
-  onSubmit: (data: {
-    diagnosis: string
-    advice: string
-    prescription: File | null
-  }) => void
-}
+export default function CompletedActions({
+  appointmentId,
+  onSuccess,
+}: {
+  appointmentId: string
+  onSuccess: () => void
+}) {
+  const [diagnosis, setDiagnosis] = useState("")
+  const [advice, setAdvice] = useState("")
+  const [file, setFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
 
-const CompletedActions = ({ onSubmit }: CompletedActionsProps) => {
-  const [diagnosis, setDiagnosis] = React.useState("")
-  const [advice, setAdvice] = React.useState("")
-  const [prescription, setPrescription] = React.useState<File | null>(null)
+  const handleSubmit = async () => {
+    if (!appointmentId) {
+      alert("Missing appointment ID")
+      return
+    }
+
+    if (!diagnosis || !advice || !file) {
+      alert("All fields are required")
+      return
+    }
+
+    try {
+      setLoading(true)
+
+     
+      await submitConsultationReport({
+        appointmentId,
+        diagnosis,
+        advice,
+        file,
+      })
+
+      onSuccess()
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Submission failed")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <Label>Diagnosis</Label>
-        <Input
-          value={diagnosis}
-          onChange={(e) => setDiagnosis(e.target.value)}
-          placeholder="Enter diagnosis"
-        />
-      </div>
+    <div className="space-y-4 border rounded-lg p-4 bg-muted/40">
+      <h4 className="font-medium">Submit Consultation Report</h4>
 
-      <div>
-        <Label>Doctor Advice</Label>
-        <Input
-          value={advice}
-          onChange={(e) => setAdvice(e.target.value)}
-          placeholder="Enter advice / suggestion"
-        />
-      </div>
+      <Input
+        placeholder="Diagnosis"
+        value={diagnosis}
+        onChange={(e) => setDiagnosis(e.target.value)}
+      />
 
-      <div>
-        <Label>Prescription</Label>
-        <Input
-          type="file"
-          onChange={(e) =>
-            setPrescription(e.target.files?.[0] || null)
-          }
-        />
-      </div>
+      <Input
+        placeholder="Medical Advice"
+        value={advice}
+        onChange={(e) => setAdvice(e.target.value)}
+      />
 
-      <Button
-        className="w-full"
-        onClick={() =>
-          onSubmit({
-            diagnosis,
-            advice,
-            prescription,
-          })
-        }
-      >
-        Submit Prescription
+      <Input
+        type="file"
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
+      />
+
+      <Button disabled={loading} className="w-full" onClick={handleSubmit}>
+        {loading ? "Submitting..." : "Submit Report"}
       </Button>
     </div>
   )
 }
 
-export default CompletedActions

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,17 +8,18 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import type { Appointment } from "@/app/data/appointment"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import type { Appointment } from "@/app/data/appointment";
+import { updateAppointmentStatus } from "../../../app/services/appointment/appointment.service";
 
 type Props = {
-  open: boolean
-  setOpen: (v: boolean) => void
-  action: "accept" | "reject" | null
-  selectedAppointment: Appointment | null
-  handleConfirm: () => void
-}
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  action: "accept" | "reject" | null;
+  selectedAppointment: Appointment | null;
+  handleConfirm: () => void;
+};
 
 export default function AppointmentDialog({
   open,
@@ -27,13 +28,35 @@ export default function AppointmentDialog({
   selectedAppointment,
   handleConfirm,
 }: Props) {
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  if (!mounted) return null
+  if (!mounted) return null;
+
+  const handleConfirmClick = async () => {
+    if (!selectedAppointment || !action) return;
+
+    try {
+      setLoading(true);
+
+      const appointmentId = selectedAppointment.id;
+
+      const res = await updateAppointmentStatus(appointmentId, action);
+
+      console.log("STATUS UPDATED:", res);
+
+      setOpen(false);
+      handleConfirm(); 
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err.message || "Update failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -54,16 +77,22 @@ export default function AppointmentDialog({
             <p><b>Symptoms:</b> {selectedAppointment.symptoms}</p>
             <p><b>Date:</b> {selectedAppointment.date}</p>
             <p><b>Time:</b> {selectedAppointment.timeSlot}</p>
+            <p className="text-xs text-gray-500">
+              <b>Appointment ID:</b> {selectedAppointment.id}
+            </p>
           </div>
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
+          <Button onClick={handleConfirmClick} disabled={loading}>
+            {loading
+              ? "Processing..."
+              : action === "accept"
+              ? "Accept"
+              : "Reject"}
           </Button>
-          <Button onClick={handleConfirm}>Confirm</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

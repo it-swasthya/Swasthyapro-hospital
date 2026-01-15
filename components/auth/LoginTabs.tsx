@@ -46,7 +46,7 @@ export default function LoginTabs() {
 
       const res = await loginDoctor(doctor);
 
-      // ✅ store token
+      // store token
       localStorage.setItem("accessToken", res.accessToken);
       document.cookie = `accessToken=${res.accessToken}; path=/;`;
 

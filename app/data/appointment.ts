@@ -17,8 +17,15 @@ export type Appointment = {
   status: AppointmentStatus
   assignedDoctor?: string
   mode: string
+  diagnosis?: string 
+  advice?: string 
+  prescription_link:string
   createdAt: string
 }
+
+
+
+
 
 
 
