@@ -334,7 +334,7 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
                 try {
                   setLoadingId(appt.id)
 
-                  // 🔥 Send EXACT selected doctor to backend
+                  // Send EXACT selected doctor to backend
                   await assignDoctor(appt.id, doctorName)
 
                   // Update UI only after backend success

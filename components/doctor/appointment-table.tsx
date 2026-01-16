@@ -68,13 +68,17 @@ const AppointmentTable = () => {
   const [openSheet, setOpenSheet] = React.useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     React.useState<Appointment | null>(null);
+ 
 
-  /* ============================
-       FETCH DATA
-    ============================ */
+ 
+    
+ 
   React.useEffect(() => {
     const loadData = async () => {
       try {
+
+       
+
         const response = await getDoctorAppointments("Dr. Ashish Gupta");
 
         console.log(response, "response data doctor");
@@ -360,46 +364,8 @@ const AppointmentTable = () => {
                   />
                 )}
 
-                {/* {selectedAppointment?.status === "Completed" && (
-                  <CompletedActions
-                    appointmentId={selectedAppointment.id} 
-                    onSuccess={() => {
-                      setData((prev) =>
-                        prev.map((apt) =>
-                          apt.id === selectedAppointment.id
-                            ? { ...apt, status: "Completed" }
-                            : apt
-                        )
-                      );
-                      setOpenSheet(false);
-                    }}
-                  />
-                )} */}
-
                 {selectedAppointment && (
                   <div className="space-y-6 px-6 py-5">
-                    {/* {selectedAppointment.status == "Completed" &&  (
-                  <>
-                    {hasPrescription(selectedAppointment) ? (
-                      <ViewPrescriptionCard appointment={selectedAppointment} />
-                    ) : (
-                    <CompletedActions
-                     appointmentId={selectedAppointment.id} 
-                     onSuccess={() => {
-                      setData((prev) =>
-                        prev.map((apt) =>
-                          apt.id === selectedAppointment.id
-                            ? { ...apt, status: "Completed" }
-                            : apt
-                        )
-                      );
-                      setOpenSheet(false);
-                    }}
-                  />
-                    )}
-                  </>
-                )} */}
-
                     {selectedAppointment.status === "Completed" && (
                       <>
                         {hasValidPrescription(selectedAppointment) ? (

@@ -17,6 +17,7 @@ export const mapApiAppointmentToUI = (
     diagnosis: item.diagnosis,
     doctor_advice: item.doctor_advice,
     prescription_link: item.prescription_link,
+    doctorName: item.doctor_allotted,
     createdAt: item.createdAt,
   
 

@@ -25,6 +25,47 @@ export const getDoctorAppointments = async (
   return res.json()
 }
 
+
+export const getAllActiveuserAppointment = async () => {
+  const AccessToken  = localStorage.getItem('accessToken');
+
+   console.log(AccessToken, "accesstoken ");
+
+  if (!AccessToken) {
+    throw new Error("Access token missing");
+  }
+
+  const res = await fetch(
+    `${BASE_URL}/appointment/consult/user/active/appointment`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${AccessToken}`, 
+      },
+      credentials:"include"
+    }
+  );
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("API Error:", res.status, errorText);
+    throw new Error("Failed to fetch appointments");
+  }
+
+  const response = await res?.json();
+  console.log("ACTIVE APPOINTMENTS:", response || []);
+  return response;
+};
+
+
+
+
+
+
+
+
+
 export const getAllAppointmentDoctorLists=async()=>{
      const res = await fetch(
     `${BASE_URL}/appointment/consult/all-appointment`,
@@ -37,6 +78,9 @@ export const getAllAppointmentDoctorLists=async()=>{
     }
   )
 
+
+
+
   if (!res.ok) {
     throw new Error("Failed to fetch appointments")
   }
@@ -48,21 +92,26 @@ export const getAllAppointmentDoctorLists=async()=>{
 
 export const updateAppointmentStatus = async (
   appointmentId: string,
-  action: "accept" | "reject"
+  action: "accept" | "reject",
+  doctor_allotted:string,
 ) => {
   const apiAction = action === "accept" ? "schedule" : "cancel";
 
   const res = await axios.put(
     `https://api.swasthyapro.com/api/appointment/consult/user/update-status-appointment/${appointmentId}`,
-    { action: apiAction },
+    { action: apiAction,
+      doctor_allotted,
+    },
     {
+      
       headers: {
         "Content-Type": "application/json",
+
       },
-      withCredentials: true,
+    
     }
   );
-
+  
   return res.data;
 };
 

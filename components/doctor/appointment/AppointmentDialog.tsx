@@ -30,9 +30,14 @@ export default function AppointmentDialog({
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+ const [getDoctorName, setGetDoctorName] = useState<string | null>(null);
+
 
   useEffect(() => {
     setMounted(true);
+     const doctorName = localStorage.getItem("user_name");
+      setGetDoctorName("Dr. Ashish Gupta");
+    
   }, []);
 
   if (!mounted) return null;
@@ -40,12 +45,18 @@ export default function AppointmentDialog({
   const handleConfirmClick = async () => {
     if (!selectedAppointment || !action) return;
 
+    if (!getDoctorName) {
+    alert("Doctor name not found");
+    return;
+  }
+
     try {
       setLoading(true);
 
       const appointmentId = selectedAppointment.id;
 
-      const res = await updateAppointmentStatus(appointmentId, action);
+      const res = await updateAppointmentStatus(appointmentId, action, getDoctorName );
+
 
       console.log("STATUS UPDATED:", res);
 
@@ -96,3 +107,6 @@ export default function AppointmentDialog({
     </Dialog>
   );
 }
+
+
+

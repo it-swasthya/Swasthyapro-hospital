@@ -1,10 +1,15 @@
 import { api } from "./api";
 
+
 export const loginDoctor = async (data: {
   email: string;
   password: string;
 }) => {
   const res = await api.post("/asdsaxz2424ssdds", data);
+
+
+
+  console.log(res?.data , "login doctor data");
   return res.data;
 };
 

@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import type { Appointment } from "@/app/data/appointment";
-import { getAllAppointmentDoctorLists } from "@/app/services/appointment/appointment.service";
+import { getAllActiveuserAppointment } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 
 import {
@@ -36,6 +36,7 @@ import {
   DialogPortal, // ADD THIS
 } from "@/components/ui/dialog";
 import AppointmentDialog from "./appointment/AppointmentDialog";
+import { log } from "node:console";
 
 /* ============================
    STATUS STYLE
@@ -69,29 +70,38 @@ const AppointmentTable = () => {
   /* ============================
        FETCH DATA
     ============================ */
+
+  
+
   React.useEffect(() => {
-    let isMounted = true;
+  let isMounted = true;
 
-    const loadData = async () => {
-      try {
-        const res = await getAllAppointmentDoctorLists();
-        if (!isMounted) return;
+  const loadData = async () => {
+    try {
 
-        const mappedData = mapApiAppointmentToUI(res.allAppointments);
-        setData(mappedData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+    const res = await getAllActiveuserAppointment();
+      
+      const appointments = res?.data || [];
 
-    loadData();
+    console.log(appointments, "appointments");
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      const mappedData = mapApiAppointmentToUI(appointments);
+      console.log(mappedData, "mapped data ");
+
+      if (isMounted) setData(mappedData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (isMounted) setLoading(false);
+    }
+  };
+
+  loadData();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
 
   /* ============================
        ACTION HANDLER
@@ -100,7 +110,6 @@ const AppointmentTable = () => {
     console.log("Update:", id, status);
     // call API here later
   };
-
 
   /* ============================
        COLUMNS
@@ -182,7 +191,7 @@ const AppointmentTable = () => {
       </div>
     );
   }
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedAppointment || !action) return;
 
     const newStatus = action === "accept" ? "Scheduled" : "Rejected";
@@ -202,48 +211,13 @@ const AppointmentTable = () => {
     setSelectedAppointment(null);
     setAction(null);
     setOpen(false);
+    
+
+    
   };
 
 
 
-// const DOCTOR_NAME = "Dr. Ashish Gupta"; 
-
-// const handleConfirm = () => {
-//   if (!selectedAppointment || !action) return;
-
-//   if (action === "accept") {
-//     setData((prev) =>
-//       prev.map((apt) =>
-//         apt.id === selectedAppointment.id
-//           ? {
-//               ...apt,
-//               status: "Scheduled",
-//               assignedDoctor: DOCTOR_NAME,
-//               rejected: false,
-//             }
-//           : apt
-//       )
-//     );
-//   }
-
-//   if (action === "reject") {
-//     setData((prev) =>
-//       prev.map((apt) =>
-//         apt.id === selectedAppointment.id
-//           ? {
-//               ...apt,
-//               status: "Rejected",
-//               rejected: true,
-//             }
-//           : apt
-//       )
-//     );
-//   }
-
-//   setSelectedAppointment(null);
-//   setAction(null);
-//   setOpen(false);
-// };
 
   return (
     <>
@@ -298,7 +272,7 @@ const AppointmentTable = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="text-center">
-                    No appointments found.
+                    No appointments found for handle accept or reject.
                   </TableCell>
                 </TableRow>
               )}
@@ -338,3 +312,6 @@ const AppointmentTable = () => {
 };
 
 export default AppointmentTable;
+
+
+

@@ -46,9 +46,16 @@ export default function LoginTabs() {
 
       const res = await loginDoctor(doctor);
 
+      console.log(res, "res data ");
+
       // store token
       localStorage.setItem("accessToken", res.accessToken);
+      localStorage.setItem("user_name", res.user.name);
+      
+     console.log(res.user.name, " set user name ");
       document.cookie = `accessToken=${res.accessToken}; path=/;`;
+     
+
 
       router.push("/doctor/dashboard");
     } catch (err: any) {
