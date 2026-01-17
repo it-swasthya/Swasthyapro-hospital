@@ -19,11 +19,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import type { Appointment } from "@/app/data/appointment";
-import { getAllActiveuserAppointment } from "@/app/services/appointment/appointment.service";
+import {
+  getAllActiveuserAppointment,
+  getAllAllottedDoctorAppointments,
+  getDoctorAppointments,
+} from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 
 import {
@@ -37,6 +53,7 @@ import {
 } from "@/components/ui/dialog";
 import AppointmentDialog from "./appointment/AppointmentDialog";
 import { log } from "node:console";
+import CompletedActions from "./appointment/CompletedActions";
 
 /* ============================
    STATUS STYLE
@@ -62,46 +79,60 @@ const AppointmentTable = () => {
   /* dialog state */
   const [open, setOpen] = React.useState(false);
   const [action, setAction] = React.useState<"accept" | "reject" | null>(null);
+  const [openSheet, setOpenSheet] = React.useState(false);
 
   // const [selectedId, setSelectedId] = React.useState<string | null>(null)
   const [selectedAppointment, setSelectedAppointment] =
     React.useState<Appointment | null>(null);
 
+  const statusColorClass = (status: string) => {
+    switch (status) {
+      case "Allotted":
+        return "bg-blue-100 text-blue-700 border-blue-300";
+      case "Scheduled":
+        return "bg-yellow-100 text-yellow-700 border-yellow-300";
+      case "Completed":
+        return "bg-green-100 text-green-700 border-green-300";
+      case "Cancelled":
+        return "bg-red-100 text-red-700 border-red-300";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-300";
+    }
+  };
+
   /* ============================
        FETCH DATA
     ============================ */
 
-  
-
   React.useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
 
-  const loadData = async () => {
-    try {
+    const loadData = async () => {
+      try {
+        // const res = await getAllActiveuserAppointment();
+        const res = await getAllAllottedDoctorAppointments("Dr. Ashish Gupta");
 
-    const res = await getAllActiveuserAppointment();
-      
-      const appointments = res?.data || [];
+        const appointments = res?.data || [];
 
-    console.log(appointments, "appointments");
+        console.log(appointments, "appointments");
 
-      const mappedData = mapApiAppointmentToUI(appointments);
-      console.log(mappedData, "mapped data ");
+        const mappedData = mapApiAppointmentToUI(appointments);
+        console.log(mappedData, "mapped data ");
 
-      if (isMounted) setData(mappedData);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      if (isMounted) setLoading(false);
-    }
-  };
+        if (isMounted) setData(mappedData);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-  loadData();
+    loadData();
 
-  return () => {
-    isMounted = false;
-  };
-}, []);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   /* ============================
        ACTION HANDLER
@@ -109,6 +140,54 @@ const AppointmentTable = () => {
   const handleUpdateStatus = (id: string, status: string) => {
     console.log("Update:", id, status);
     // call API here later
+  };
+
+  const ViewPrescriptionCard = ({
+    appointment,
+  }: {
+    appointment: Appointment;
+  }) => {
+    return (
+      <div className="rounded-lg border bg-green-50 p-4 space-y-4">
+        <h3 className="text-sm font-semibold text-green-700">
+          Consultation Report
+        </h3>
+
+        <div>
+          <p className="text-xs text-muted-foreground">Diagnosis</p>
+          <p className="text-sm font-medium">{appointment.diagnosis}</p>
+        </div>
+
+        <div>
+          <p className="text-xs text-muted-foreground">Advice</p>
+          <p className="text-sm font-medium">{appointment.doctor_advice}</p>
+        </div>
+
+        <div>
+          <p className="text-xs text-muted-foreground">Prescription</p>
+          <a
+            href={appointment.prescription_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline text-sm"
+          >
+            View Prescription
+          </a>
+        </div>
+      </div>
+    );
+  };
+
+  const hasValidPrescription = (apt: Appointment) => {
+    return (
+      apt.status === "Completed" &&
+      apt.diagnosis !== null &&
+      apt.diagnosis !== "" &&
+      apt.doctor_advice !== null &&
+      apt.doctor_advice !== "" &&
+      apt.prescription_link !== null &&
+      apt.prescription_link !== ""
+    );
   };
 
   /* ============================
@@ -127,7 +206,12 @@ const AppointmentTable = () => {
         header: "Status",
         cell: ({ getValue }) => {
           const status = getValue<string>();
-          return <Badge variant={statusVariant(status) as any}>{status}</Badge>;
+
+          return (
+            <Badge className={`border ${statusColorClass(status)}`}>
+              {status}
+            </Badge>
+          );
         },
       },
       {
@@ -136,25 +220,37 @@ const AppointmentTable = () => {
         cell: ({ row }) => {
           const { status, id } = row.original;
 
-          if (status !== "Allotted") {
-            return <span className="text-muted-foreground">—</span>;
-          }
-
           return (
             <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => openDialog(row.original, "accept")}
-              >
-                Accept
-              </Button>
+              {row.original.status === "Allotted" ? (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => openDialog(row.original, "accept")}
+                  >
+                    Accept
+                  </Button>
 
-              <Button
-                variant="destructive"
-                onClick={() => openDialog(row.original, "reject")}
-              >
-                Reject
-              </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => openDialog(row.original, "reject")}
+                  >
+                    Reject
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedAppointment(row.original);
+                    setOpenSheet(row.original.status !== "Cancelled");
+                  }}
+                >
+                  View
+                </Button>
+              )}
             </div>
           );
         },
@@ -162,6 +258,7 @@ const AppointmentTable = () => {
     ],
     []
   );
+
   const openDialog = (appointment: Appointment, type: "accept" | "reject") => {
     setSelectedAppointment(appointment);
     setAction(type);
@@ -191,33 +288,21 @@ const AppointmentTable = () => {
       </div>
     );
   }
+
   const handleConfirm = async () => {
     if (!selectedAppointment || !action) return;
 
-    const newStatus = action === "accept" ? "Scheduled" : "Rejected";
+    const newStatus = action === "accept" ? "Scheduled" : "Cancelled";
 
     setData((prev) =>
       prev.map((apt) =>
-        apt.id === selectedAppointment.id
-          ? {
-              ...apt,
-              status: newStatus,
-              rejected: action === "reject",
-            }
-          : apt
+        apt.id === selectedAppointment.id ? { ...apt, status: newStatus } : apt
       )
     );
-
     setSelectedAppointment(null);
     setAction(null);
     setOpen(false);
-    
-
-    
   };
-
-
-
 
   return (
     <>
@@ -254,7 +339,7 @@ const AppointmentTable = () => {
                   <TableRow
                     key={row.id}
                     className={
-                      row.original.rejected
+                      row.original.status == "Cancelled"
                         ? "bg-red-50 border-l-4 border-red-500"
                         : ""
                     }
@@ -298,7 +383,164 @@ const AppointmentTable = () => {
           >
             Next
           </Button>
+
+          <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+            <SheetContent className="w-[520px] sm:w-[480px] p-0">
+              {/* HEADER */}
+              <VisuallyHidden>
+                <SheetTitle>Appointment Details</SheetTitle>
+              </VisuallyHidden>
+              <div className="border-b px-6 py-4">
+                <h2 className="text-lg font-semibold">Appointment Details</h2>
+                <p className="text-sm text-muted-foreground">
+                  Review patient information and take action
+                </p>
+              </div>
+
+              {selectedAppointment && (
+                <div className="space-y-6 px-6 py-5">
+                  {/* PATIENT INFO */}
+                  <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-medium">
+                        {selectedAppointment.patientName}
+                      </h3>
+
+                      <Badge
+                        variant={
+                          statusVariant(selectedAppointment.status) as any
+                        }
+                      >
+                        {selectedAppointment.status}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Contact</p>
+                        <p className="font-medium">
+                          {selectedAppointment.contact}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-muted-foreground">Date</p>
+                        <p className="font-medium">
+                          {selectedAppointment.date}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-muted-foreground">Time Slot</p>
+                        <p className="font-medium">
+                          {selectedAppointment.timeSlot}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SYMPTOMS */}
+                  <div className="rounded-lg border p-4">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Symptoms
+                    </p>
+                    <p className="text-sm">{selectedAppointment.symptoms}</p>
+                  </div>
+
+                  {/* {selectedAppointment.status === "Allotted" && (
+                           <div className="flex gap-3">
+                             <Button
+                               className="flex-1"
+                               onClick={() =>
+                                 setConfirmAction({
+                                   type: "accept",
+                                   appointment: selectedAppointment,
+                                 })
+                               }
+                             >
+                               Accept
+                             </Button>
+         
+                             <Button
+                               variant="destructive"
+                               className="flex-1"
+                               onClick={() =>
+                                 setConfirmAction({
+                                   type: "reject",
+                                   appointment: selectedAppointment,
+                                 })
+                               }
+                             >
+                               Reject
+                             </Button>
+                           </div>
+                         )} */}
+
+                  {selectedAppointment && (
+                    <div className="space-y-6 px-6 py-5">
+                      {selectedAppointment.status === "Completed" && (
+                        <>
+                          {hasValidPrescription(selectedAppointment) ? (
+                            <ViewPrescriptionCard
+                              appointment={selectedAppointment}
+                            />
+                          ) : (
+                            <CompletedActions
+                              appointmentId={selectedAppointment.id}
+                              onSuccess={(response) => {
+                                const updated = response.data;
+
+                                setData((prev) =>
+                                  prev.map((apt) =>
+                                    apt.id === selectedAppointment.id
+                                      ? {
+                                          ...apt,
+                                          status: "Completed",
+                                          diagnosis: updated.diagnosis,
+                                          doctor_advice: updated.doctor_advice,
+                                          prescription_link:
+                                            updated.prescription_link,
+                                        }
+                                      : apt
+                                  )
+                                );
+
+                                setSelectedAppointment((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        status: "Completed",
+                                        diagnosis: updated.diagnosis,
+                                        doctor_advice: updated.doctor_advice,
+                                        prescription_link:
+                                          updated.prescription_link,
+                                      }
+                                    : prev
+                                );
+                              }}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* FOOTER */}
+              <div className="border-t px-6 py-4">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setOpenSheet(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
+
         <AppointmentDialog
           open={open}
           setOpen={setOpen}
@@ -312,6 +554,3 @@ const AppointmentTable = () => {
 };
 
 export default AppointmentTable;
-
-
-

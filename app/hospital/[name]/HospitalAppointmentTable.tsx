@@ -386,9 +386,28 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
           return <Badge variant={statusVariant(status) as any}>{status}</Badge>
         },
       },
-    ],
-    [loadingId]
-  )
+   {
+      id: "doctorAssigned",
+      header: "Assigned",
+      size: 150,
+      cell: ({ row }) => {
+        const hasDoctor = !!row.original.assignedDoctor
+
+        return (
+          <Badge
+            className={
+              hasDoctor
+                ? "bg-green-100 text-green-700 border border-green-300"
+                : "bg-red-100 text-red-700 border border-red-300"
+            }
+          >
+            {hasDoctor ? "Yes" : "No"}
+          </Badge>
+        )
+      },
+    },
+  ], [loadingId])
+   
 
   const table = useReactTable({
     data: tableData,

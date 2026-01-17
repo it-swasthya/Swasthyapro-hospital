@@ -16,6 +16,7 @@ export type Appointment = {
   timeSlot: string
   status: AppointmentStatus
   assignedDoctor?: string
+  IsAssignedDoctor?:string
   mode: string
   diagnosis?: string 
   advice?: string 

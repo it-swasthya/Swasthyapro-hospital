@@ -1,0 +1,62 @@
+"use client"
+
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+} from "@mui/material"
+
+interface ConfirmationDialogProps {
+  open: boolean
+  title?: string
+  description?: string
+  confirmText?: string
+  cancelText?: string
+  onConfirm: () => void
+  onClose: () => void
+}
+
+const ConfirmationDialog = ({
+  open,
+  title = "Confirm Action",
+  description = "Are you sure you want to continue?",
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  onConfirm,
+  onClose,
+}: ConfirmationDialogProps) => {
+
+  const handleConfirm = () => {
+    onConfirm()
+    onClose()
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+    >
+      <DialogTitle>{title}</DialogTitle>
+
+      <DialogContent>
+        <Typography>{description}</Typography>
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onClose} color="inherit">
+          {cancelText}
+        </Button>
+        <Button onClick={handleConfirm} variant="contained">
+          {confirmText}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+export default ConfirmationDialog

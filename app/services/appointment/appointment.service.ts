@@ -3,12 +3,32 @@ import axios from "axios"
 
 const BASE_URL = "https://api.swasthyapro.com/api"
 
+export const getAllAllottedDoctorAppointments = async (
+  doctorName: string
+) => {
+  const res = await fetch(
+    `${BASE_URL}/appointment/consult/list-appointment/${doctorName}?type=allotted`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store", 
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch appointments")
+  }
+
+  return res.json()
+}
 
 export const getDoctorAppointments = async (
   doctorName: string
 ) => {
   const res = await fetch(
-    `${BASE_URL}/appointment/consult/list-appointment/${doctorName}`,
+    `${BASE_URL}/appointment/consult/list-appointment/${doctorName}?type=history`,
     {
       method: "GET",
       headers: {

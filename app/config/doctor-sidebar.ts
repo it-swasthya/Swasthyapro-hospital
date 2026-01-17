@@ -14,6 +14,11 @@ export const doctorSidebarItems = [
     url: "/doctor/request",
     icon: "video",
   },
+   {
+    title: "Your Appointment",
+    url: "/doctor/your-appointment",
+    icon: "video",
+  },
   {
     title: "Support Swasthyapro",
     url: "/doctor/support",

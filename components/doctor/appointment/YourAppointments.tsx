@@ -1,3 +1,7 @@
+
+
+
+
 "use client";
 
 import * as React from "react";
@@ -10,7 +14,16 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { Label } from "@/components/ui/label";
 
@@ -26,7 +39,7 @@ import {
 } from "@/components/ui/sheet";
 
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
+// import { SheetTitle } from "@/components/ui/sheet"
 
 import AllottedActions from "@/components/doctor/appointment/AllottedActions";
 import CompletedActions from "@/components/doctor/appointment/CompletedActions";
@@ -42,7 +55,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
+import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 
 import type { Appointment } from "@/app/data/appointment";
 import { getDoctorAppointments } from "@/app/services/appointment/appointment.service";
@@ -64,7 +77,7 @@ const statusVariant = (status: string) => {
   }
 };
 
-const AppointmentTable = () => {
+const YourAppointmentTable = () => {
   const [data, setData] = React.useState<Appointment[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [sorting, setSorting] = React.useState<any>([]);
@@ -456,7 +469,72 @@ const AppointmentTable = () => {
               </div>
             )}
 
-        
+            <AlertDialog
+              open={!!confirmAction}
+              onOpenChange={() => setConfirmAction(null)}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {confirmAction?.type === "accept"
+                      ? "Accept Appointment?"
+                      : "Reject Appointment?"}
+                  </AlertDialogTitle>
+
+                  <AlertDialogDescription>
+                    {confirmAction?.type === "accept"
+                      ? "This appointment will be marked as Scheduled."
+                      : "This appointment will be cancelled and highlighted in red."}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                  <AlertDialogAction
+                    onClick={async () => {
+                      if (!confirmAction?.appointment) return;
+
+                      const { id, doctorName } = confirmAction.appointment;
+
+                      try {
+                        //  API CALL
+                        await updateAppointmentStatus(
+                          id,
+                          confirmAction.type,
+                          doctorName
+                        );
+
+                        const newStatus =
+                          confirmAction.type === "accept"
+                            ? "Scheduled"
+                            : "Cancelled";
+
+                        //  Update table
+                        setData((prev) =>
+                          prev.map((apt) =>
+                            apt.id === id ? { ...apt, status: newStatus } : apt
+                          )
+                        );
+                        //  Update sheet
+                        setSelectedAppointment((prev) =>
+                          prev ? { ...prev, status: newStatus } : prev
+                        );
+
+                        setOpenSheet(false);
+                      } catch (error) {
+                        console.error("Status update failed", error);
+                        // optional: toast.error("Failed to update status")
+                      } finally {
+                        setConfirmAction(null);
+                      }
+                    }}
+                  >
+                    Confirm
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             {/* FOOTER */}
             <div className="border-t px-6 py-4">
@@ -475,4 +553,4 @@ const AppointmentTable = () => {
   );
 };
 
-export default AppointmentTable;
+export default YourAppointmentTable;
