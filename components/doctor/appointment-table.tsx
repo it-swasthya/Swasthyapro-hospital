@@ -10,8 +10,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-
-
 import { Label } from "@/components/ui/label";
 
 import {
@@ -26,7 +24,6 @@ import {
 } from "@/components/ui/sheet";
 
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
 
 import AllottedActions from "@/components/doctor/appointment/AllottedActions";
 import CompletedActions from "@/components/doctor/appointment/CompletedActions";
@@ -43,11 +40,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-
 import type { Appointment } from "@/app/data/appointment";
-import { getDoctorAppointments } from "@/app/services/appointment/appointment.service";
+import { getAllAllottedAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
+import { fetchProtectedData } from "@/app/services/wrapper/authentication";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -95,9 +92,14 @@ const AppointmentTable = () => {
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await getDoctorAppointments("Dr. Ashish Gupta");
+        // const response = await getAllAllottedAppointments({
+        //   hospital_name: "MASHH",
+        // });
+        const response = await fetchProtectedData(
+          `https://api.swasthyapro.com/api/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
+        );
 
-        console.log(response, "response data doctor");
+        console.log(response, "response data doctor AND HOSPITAL");
         const mappedData = mapApiAppointmentToUI(response.data);
         setData(mappedData);
       } catch (error) {
@@ -184,6 +186,10 @@ const AppointmentTable = () => {
         header: "Time Slot",
       },
       {
+        accessorKey: "hospital",
+        header: "Hospital",
+      },
+      {
         accessorKey: "status",
         header: "Status",
         cell: ({ getValue }) => {
@@ -213,7 +219,7 @@ const AppointmentTable = () => {
         ),
       },
     ],
-    []
+    [],
   );
 
   /* ============================
@@ -256,7 +262,7 @@ const AppointmentTable = () => {
                   >
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                     {{
                       asc: " 🔼",
@@ -283,7 +289,7 @@ const AppointmentTable = () => {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -376,6 +382,16 @@ const AppointmentTable = () => {
                   <p className="text-sm">{selectedAppointment.symptoms}</p>
                 </div>
 
+
+                {/* hospital */}
+
+                   <div className="rounded-lg border p-4">
+                  <p className="text-xs text-muted-foreground mb-1">Hospital</p>
+                  <p className="text-sm">{selectedAppointment.hospital}</p>
+                </div>
+
+
+
                 {selectedAppointment.status === "Allotted" && (
                   <div className="flex gap-3">
                     <Button
@@ -430,8 +446,8 @@ const AppointmentTable = () => {
                                         prescription_link:
                                           updated.prescription_link,
                                       }
-                                    : apt
-                                )
+                                    : apt,
+                                ),
                               );
 
                               setSelectedAppointment((prev) =>
@@ -444,7 +460,7 @@ const AppointmentTable = () => {
                                       prescription_link:
                                         updated.prescription_link,
                                     }
-                                  : prev
+                                  : prev,
                               );
                             }}
                           />
@@ -455,8 +471,6 @@ const AppointmentTable = () => {
                 )}
               </div>
             )}
-
-        
 
             {/* FOOTER */}
             <div className="border-t px-6 py-4">

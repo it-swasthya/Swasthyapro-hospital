@@ -36,7 +36,7 @@ import { Button } from "@/components/ui/button";
 
 import type { Appointment } from "@/app/data/appointment";
 import {
-  getAllActiveuserAppointment,
+  getAllAllottedAppointments,
   getAllAllottedDoctorAppointments,
   getDoctorAppointments,
 } from "@/app/services/appointment/appointment.service";
@@ -54,6 +54,7 @@ import {
 import AppointmentDialog from "./appointment/AppointmentDialog";
 import { log } from "node:console";
 import CompletedActions from "./appointment/CompletedActions";
+import { fetchProtectedData } from "@/app/services/wrapper/authentication";
 
 /* ============================
    STATUS STYLE
@@ -109,12 +110,19 @@ const AppointmentTable = () => {
 
     const loadData = async () => {
       try {
-        // const res = await getAllActiveuserAppointment();
-        const res = await getAllAllottedDoctorAppointments("Dr. Ashish Gupta");
+        // const res = await getAllAllottedAppointments({
+        //   hospital_name: "",
+        // });
+
+       const res= await fetchProtectedData("https://api.swasthyapro.com/api/appointment/consult/doctor/allotted/appointment?hospital_name=");
+
+
+        console.log(res?.data , "reposso o")
 
         const appointments = res?.data || [];
 
         console.log(appointments, "appointments");
+
 
         const mappedData = mapApiAppointmentToUI(appointments);
         console.log(mappedData, "mapped data ");
@@ -256,7 +264,7 @@ const AppointmentTable = () => {
         },
       },
     ],
-    []
+    [],
   );
 
   const openDialog = (appointment: Appointment, type: "accept" | "reject") => {
@@ -296,8 +304,8 @@ const AppointmentTable = () => {
 
     setData((prev) =>
       prev.map((apt) =>
-        apt.id === selectedAppointment.id ? { ...apt, status: newStatus } : apt
-      )
+        apt.id === selectedAppointment.id ? { ...apt, status: newStatus } : apt,
+      ),
     );
     setSelectedAppointment(null);
     setAction(null);
@@ -321,7 +329,7 @@ const AppointmentTable = () => {
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                       {{
                         asc: " 🔼",
@@ -348,7 +356,7 @@ const AppointmentTable = () => {
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
@@ -446,8 +454,8 @@ const AppointmentTable = () => {
                     </p>
                     <p className="text-sm">{selectedAppointment.symptoms}</p>
                   </div>
-
-                  {/* {selectedAppointment.status === "Allotted" && (
+{/* 
+                  {selectedAppointment.status === "Allotted" && (
                            <div className="flex gap-3">
                              <Button
                                className="flex-1"
@@ -501,8 +509,8 @@ const AppointmentTable = () => {
                                           prescription_link:
                                             updated.prescription_link,
                                         }
-                                      : apt
-                                  )
+                                      : apt,
+                                  ),
                                 );
 
                                 setSelectedAppointment((prev) =>
@@ -515,7 +523,7 @@ const AppointmentTable = () => {
                                         prescription_link:
                                           updated.prescription_link,
                                       }
-                                    : prev
+                                    : prev,
                                 );
                               }}
                             />

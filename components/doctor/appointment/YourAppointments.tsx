@@ -58,9 +58,10 @@ import { Button } from "@/components/ui/button";
 import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 
 import type { Appointment } from "@/app/data/appointment";
-import { getDoctorAppointments } from "@/app/services/appointment/appointment.service";
+import { getDoctorAllAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
+import { fetchProtectedData } from "@/app/services/wrapper/authentication";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -108,10 +109,16 @@ const YourAppointmentTable = () => {
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await getDoctorAppointments("Dr. Ashish Gupta");
+        //const response = await getDoctorAllAppointments();
+
+
+        const response = await fetchProtectedData('https://api.swasthyapro.com/api/appointment/consult/doctor/all/appointment');
+
+
+
 
         console.log(response, "response data doctor");
-        const mappedData = mapApiAppointmentToUI(response.data);
+        const mappedData = mapApiAppointmentToUI(response?.data);
         setData(mappedData);
       } catch (error) {
         console.error(error);
