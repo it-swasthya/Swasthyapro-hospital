@@ -60,8 +60,9 @@ import { updateAppointmentStatus } from "@/app/services/appointment/appointment.
 import type { Appointment } from "@/app/data/appointment";
 import { getDoctorAllAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
-import { Input } from "../ui/input";
-import { fetchProtectedData } from "@/app/services/wrapper/authentication";
+import { apiFetch } from "@/app/services/wrapper/authentication";
+// import { Input } from "../ui/input";
+// import { fetchProtectedData } from "@/app/services/wrapper/authentication";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -112,7 +113,7 @@ const YourAppointmentTable = () => {
         //const response = await getDoctorAllAppointments();
 
 
-        const response = await fetchProtectedData('https://api.swasthyapro.com/api/appointment/consult/doctor/all/appointment');
+        const response = await apiFetch('/appointment/consult/doctor/all/appointment');
 
 
 

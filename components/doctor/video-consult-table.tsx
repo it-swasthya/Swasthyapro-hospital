@@ -54,7 +54,7 @@ import {
 import AppointmentDialog from "./appointment/AppointmentDialog";
 import { log } from "node:console";
 import CompletedActions from "./appointment/CompletedActions";
-import { fetchProtectedData } from "@/app/services/wrapper/authentication";
+import { apiFetch } from "@/app/services/wrapper/authentication";
 
 /* ============================
    STATUS STYLE
@@ -112,9 +112,11 @@ const AppointmentTable = () => {
 
     const loadData = async () => {
       try {
-       
+        // const res = await getAllAllottedAppointments({
+        //   hospital_name: "",
+        // });
 
-       const res= await fetchProtectedData(`https://api.swasthyapro.com/api/appointment/consult/doctor/allotted/appointment?hospital_name=`);
+       const res= await apiFetch("/appointment/consult/doctor/allotted/appointment?hospital_name=");
 
 
         console.log(res?.data , "reposso o")
@@ -495,7 +497,7 @@ const AppointmentTable = () => {
                           ) : (
                             <CompletedActions
                               appointmentId={selectedAppointment.id}
-                              onSuccess={(response) => {
+                              onSuccess={(response: { data: any; }) => {
                                 const updated = response.data;
 
                                 setData((prev) =>

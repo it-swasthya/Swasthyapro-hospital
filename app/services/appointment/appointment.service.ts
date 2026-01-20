@@ -1,5 +1,5 @@
 import axios from "axios";
-import { fetchProtectedData } from "../wrapper/authentication";
+// import { fetchProtectedData } from "../wrapper/authentication";
 
 const BASE_URL = "https://api.swasthyapro.com/api";
 
@@ -89,27 +89,27 @@ export const getDoctorAppointments = async (doctorName: string) => {
   return await res.json();
 };
 
-export const getAllAllottedAppointments = async ({
-  hospital_name,
-}: {
-  hospital_name: string;
-}) => {
-  const accessToken = localStorage.getItem("accessToken");
+// export const getAllAllottedAppointments = async ({
+//   hospital_name,
+// }: {
+//   hospital_name: string;
+// }) => {
+//   const accessToken = localStorage.getItem("accessToken");
 
-  if (!accessToken) {
-    throw new Error("Access token missing");
-  }
+//   if (!accessToken) {
+//     throw new Error("Access token missing");
+//   }
 
-  const query = new URLSearchParams({ hospital_name }).toString();
+//   const query = new URLSearchParams({ hospital_name }).toString();
 
-  const url = `${BASE_URL}/appointment/consult/doctor/allotted/appointment?${query}`;
+//   const url = `${BASE_URL}/appointment/consult/doctor/allotted/appointment?${query}`;
 
-  const res = await fetchProtectedData(url);
+//   const res = await fetchProtectedData(url);
 
-  console.log(res , "rss sssss");
+//   console.log(res , "rss sssss");
 
-  return res;
-};
+//   return res;
+// };
 
 // export const getDoctorAllAppointments = async () => {
 //   const accessToken = localStorage.getItem("accessToken");
