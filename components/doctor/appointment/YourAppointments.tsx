@@ -1,7 +1,3 @@
-
-
-
-
 "use client";
 
 import * as React from "react";
@@ -112,11 +108,9 @@ const YourAppointmentTable = () => {
       try {
         //const response = await getDoctorAllAppointments();
 
-
-        const response = await apiFetch('/appointment/consult/doctor/all/appointment');
-
-
-
+        const response = await apiFetch(
+          "/appointment/consult/doctor/all/appointment",
+        );
 
         console.log(response, "response data doctor");
         const mappedData = mapApiAppointmentToUI(response?.data);
@@ -201,6 +195,14 @@ const YourAppointmentTable = () => {
         header: "Date",
       },
       {
+        accessorKey: "speciality",
+        header: "Speciality",
+      },
+      {
+        accessorKey: "hospital",
+        header: "Hospital",
+      },
+      {
         accessorKey: "timeSlot",
         header: "Time Slot",
       },
@@ -234,7 +236,7 @@ const YourAppointmentTable = () => {
         ),
       },
     ],
-    []
+    [],
   );
 
   /* ============================
@@ -277,7 +279,7 @@ const YourAppointmentTable = () => {
                   >
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                     {{
                       asc: " 🔼",
@@ -304,7 +306,7 @@ const YourAppointmentTable = () => {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -388,6 +390,18 @@ const YourAppointmentTable = () => {
                         {selectedAppointment.timeSlot}
                       </p>
                     </div>
+                    <div>
+                      <p className="text-muted-foreground">Speaciality</p>
+                      <p className="font-medium">
+                        {selectedAppointment.speciality}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Hospital</p>
+                      <p className="font-medium">
+                        {selectedAppointment.hospital}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -426,53 +440,84 @@ const YourAppointmentTable = () => {
                   </div>
                 )}
 
-                {selectedAppointment && (
-                  <div className="space-y-6 px-6 py-5">
-                    {selectedAppointment.status === "Completed" && (
-                      <>
-                        {hasValidPrescription(selectedAppointment) ? (
-                          <ViewPrescriptionCard
-                            appointment={selectedAppointment}
-                          />
-                        ) : (
-                          <CompletedActions
-                            appointmentId={selectedAppointment.id}
-                            onSuccess={(response) => {
-                              const updated = response.data;
+                {selectedAppointment.status === "Scheduled" && (
+                  <div className="space-y-4 rounded-lg border p-4 bg-muted/40">
+                    <h4 className="font-medium">Upcoming Consultation</h4>
 
-                              setData((prev) =>
-                                prev.map((apt) =>
-                                  apt.id === selectedAppointment.id
-                                    ? {
-                                        ...apt,
-                                        status: "Completed",
-                                        diagnosis: updated.diagnosis,
-                                        doctor_advice: updated.doctor_advice,
-                                        prescription_link:
-                                          updated.prescription_link,
-                                      }
-                                    : apt
-                                )
-                              );
+                    {/* Time Slot */}
+                    <div className="text-sm text-muted-foreground">
+                      <p>
+                        <span className="font-medium text-foreground">
+                          Date:
+                        </span>{" "}
+                        {selectedAppointment.date}
+                      </p>
+                      <p>
+                        <span className="font-medium text-foreground">
+                          Time:
+                        </span>{" "}
+                        {selectedAppointment.timeSlot}
+                      </p>
+                    </div>
 
-                              setSelectedAppointment((prev) =>
-                                prev
-                                  ? {
-                                      ...prev,
-                                      status: "Completed",
-                                      diagnosis: updated.diagnosis,
-                                      doctor_advice: updated.doctor_advice,
-                                      prescription_link:
-                                        updated.prescription_link,
-                                    }
-                                  : prev
-                              );
-                            }}
-                          />
-                        )}
-                      </>
+                    {/* Google Meet Link */}
+                    {selectedAppointment.meet_link ? (
+                      <Button
+                        className="w-full"
+                        onClick={() =>
+                          window.open(selectedAppointment.meet_link, "_blank")
+                        }
+                      >
+                        Join Google Meet
+                      </Button>
+                    ) : (
+                      <p className="text-sm text-destructive">
+                        Google Meet link will available soon
+                      </p>
                     )}
                   </div>
+                )}
+
+                {selectedAppointment.status === "Completed" && (
+                  <>
+                    {hasValidPrescription(selectedAppointment) ? (
+                      <ViewPrescriptionCard appointment={selectedAppointment} />
+                    ) : (
+                      <CompletedActions
+                        appointmentId={selectedAppointment.id}
+                        onSuccess={(response) => {
+                          const updated = response.data;
+
+                          setData((prev) =>
+                            prev.map((apt) =>
+                              apt.id === selectedAppointment.id
+                                ? {
+                                    ...apt,
+                                    status: "Completed",
+                                    diagnosis: updated.diagnosis,
+                                    doctor_advice: updated.doctor_advice,
+                                    prescription_link:
+                                      updated.prescription_link,
+                                  }
+                                : apt,
+                            ),
+                          );
+
+                          setSelectedAppointment((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  status: "Completed",
+                                  diagnosis: updated.diagnosis,
+                                  doctor_advice: updated.doctor_advice,
+                                  prescription_link: updated.prescription_link,
+                                }
+                              : prev,
+                          );
+                        }}
+                      />
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -506,11 +551,10 @@ const YourAppointmentTable = () => {
                       const { id, doctorName } = confirmAction.appointment;
 
                       try {
-                        //  API CALL
                         await updateAppointmentStatus(
                           id,
                           confirmAction.type,
-                          doctorName
+                          doctorName,
                         );
 
                         const newStatus =
@@ -521,12 +565,12 @@ const YourAppointmentTable = () => {
                         //  Update table
                         setData((prev) =>
                           prev.map((apt) =>
-                            apt.id === id ? { ...apt, status: newStatus } : apt
-                          )
+                            apt.id === id ? { ...apt, status: newStatus } : apt,
+                          ),
                         );
                         //  Update sheet
                         setSelectedAppointment((prev) =>
-                          prev ? { ...prev, status: newStatus } : prev
+                          prev ? { ...prev, status: newStatus } : prev,
                         );
 
                         setOpenSheet(false);
