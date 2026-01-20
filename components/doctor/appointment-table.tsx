@@ -13,6 +13,17 @@ import {
 import { Label } from "@/components/ui/label";
 
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import {
   Sheet,
   SheetClose,
   SheetContent,
@@ -41,7 +52,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import type { Appointment } from "@/app/data/appointment";
-import { getAllAllottedAppointments } from "@/app/services/appointment/appointment.service";
+import { getAllAllottedAppointments, updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
 import { fetchProtectedData } from "@/app/services/wrapper/authentication";
@@ -184,6 +195,10 @@ const AppointmentTable = () => {
       {
         accessorKey: "timeSlot",
         header: "Time Slot",
+      },
+        {
+        accessorKey: "speciality",
+        header: "Speciality",
       },
       {
         accessorKey: "hospital",
@@ -383,6 +398,12 @@ const AppointmentTable = () => {
                 </div>
 
 
+                <div className="rounded-lg border p-4">
+                  <p className="text-xs text-muted-foreground mb-1">Speciality</p>
+                  <p className="text-sm">{selectedAppointment.speciality}</p>
+                </div>
+
+
                 {/* hospital */}
 
                    <div className="rounded-lg border p-4">
@@ -471,6 +492,73 @@ const AppointmentTable = () => {
                 )}
               </div>
             )}
+
+              <AlertDialog
+              open={!!confirmAction}
+              onOpenChange={() => setConfirmAction(null)}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {confirmAction?.type === "accept"
+                      ? "Accept Appointment?"
+                      : "Reject Appointment?"}
+                  </AlertDialogTitle>
+
+                  <AlertDialogDescription>
+                    {confirmAction?.type === "accept"
+                      ? "This appointment will be marked as Scheduled."
+                      : "This appointment will be cancelled and highlighted in red."}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                  <AlertDialogAction
+                    onClick={async () => {
+                      if (!confirmAction?.appointment) return;
+
+                      const { id, doctorName } = confirmAction.appointment;
+
+                      try {
+                        //  API CALL
+                        await updateAppointmentStatus(
+                          id,
+                          confirmAction.type,
+                          doctorName
+                        );
+
+                        const newStatus =
+                          confirmAction.type === "accept"
+                            ? "Scheduled"
+                            : "Cancelled";
+
+                        //  Update table
+                        setData((prev) =>
+                          prev.map((apt) =>
+                            apt.id === id ? { ...apt, status: newStatus } : apt
+                          )
+                        );
+                        //  Update sheet
+                        setSelectedAppointment((prev) =>
+                          prev ? { ...prev, status: newStatus } : prev
+                        );
+
+                        setOpenSheet(false);
+                      } catch (error) {
+                        console.error("Status update failed", error);
+                        // optional: toast.error("Failed to update status")
+                      } finally {
+                        setConfirmAction(null);
+                      }
+                    }}
+                  >
+                    Confirm
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             {/* FOOTER */}
             <div className="border-t px-6 py-4">

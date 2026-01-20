@@ -111,33 +111,33 @@ export const getAllAllottedAppointments = async ({
   return res;
 };
 
-export const getDoctorAllAppointments = async () => {
-  const accessToken = localStorage.getItem("accessToken");
+// export const getDoctorAllAppointments = async () => {
+//   const accessToken = localStorage.getItem("accessToken");
 
-  if (!accessToken) {
-    throw new Error("Access token missing");
-  }
+//   if (!accessToken) {
+//     throw new Error("Access token missing");
+//   }
 
-  const url = `${BASE_URL}/appointment/consult/doctor/all/appointment`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    credentials: "include",
-  });
+//   const url = `${BASE_URL}/appointment/consult/doctor/all/appointment`;
+//   const res = await fetch(url, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${accessToken}`,
+//     },
+//     credentials: "include",
+//   });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error("API Error:", res.status, errorText);
-    throw new Error("Failed to fetch all appointments");
-  }
+//   if (!res.ok) {
+//     const errorText = await res.text();
+//     console.error("API Error:", res.status, errorText);
+//     throw new Error("Failed to fetch all appointments");
+//   }
 
-  const response = await res.json();
-  console.log("ALLOTTED APPOINTMENTS:", response);
-  return response;
-};
+//   const response = await res.json();
+//   console.log("ALLOTTED APPOINTMENTS:", response);
+//   return response;
+// };
 
 export const getAllAppointmentDoctorLists = async () => {
   const res = await fetch(`${BASE_URL}/appointment/consult/all-appointment`, {

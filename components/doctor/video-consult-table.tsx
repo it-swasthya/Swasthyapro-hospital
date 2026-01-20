@@ -108,13 +108,13 @@ const AppointmentTable = () => {
   React.useEffect(() => {
     let isMounted = true;
 
+    
+
     const loadData = async () => {
       try {
-        // const res = await getAllAllottedAppointments({
-        //   hospital_name: "",
-        // });
+       
 
-       const res= await fetchProtectedData("https://api.swasthyapro.com/api/appointment/consult/doctor/allotted/appointment?hospital_name=");
+       const res= await fetchProtectedData(`https://api.swasthyapro.com/api/appointment/consult/doctor/allotted/appointment?hospital_name=`);
 
 
         console.log(res?.data , "reposso o")

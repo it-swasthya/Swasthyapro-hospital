@@ -8,9 +8,13 @@ export const refreshToken = async () => {
     credentials: 'include',
   });
 
+  console.log(res, "refresh token api working or not ");
+
   if (!res.ok) {
     throw new Error('Refresh token failed');
   }
+
+  
 
   return res.json();
 };
@@ -21,7 +25,9 @@ export const fetchProtectedData = async (
 ): Promise<any> => {
   let accessToken = localStorage.getItem('accessToken');
 
-  // 🔁 Try refresh if token missing
+  console.log(accessToken, "accessToken ");
+
+  //  Try refresh if token missing
   if (!accessToken) {
     const refreshed = await refreshToken();
     accessToken = refreshed?.accessToken;
@@ -42,9 +48,11 @@ export const fetchProtectedData = async (
     credentials: 'include',
   });
 
-  // 🔄 Token expired
+ 
   if (res.status === 401 && retry) {
     const refreshed = await refreshToken();
+
+    console.log(refreshToken, "refresh token attached or not ? ");
 
     const newToken = refreshed?.accessToken;
     if (!newToken) {
@@ -53,7 +61,7 @@ export const fetchProtectedData = async (
 
     localStorage.setItem('accessToken', newToken);
 
-    return fetchProtectedData(url, false); // ⛔ retry only once
+    return fetchProtectedData(url, true); 
   }
 
   if (res.status === 404) {
