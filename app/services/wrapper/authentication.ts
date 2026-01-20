@@ -2,66 +2,58 @@
 
 const BASE_URL = 'https://api.swasthyapro.com/api';
 
-export const refreshToken = async () => {
-  const res = await fetch(`${BASE_URL}/auth/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-  });
+let refreshPromise: Promise<any> | null = null;
 
-  if (!res.ok) {
-    throw new Error('Refresh token failed');
+const refreshAccessToken = async () => {
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    }).finally(() => {
+      refreshPromise = null;
+    });
   }
-
-  return res.json();
+  return refreshPromise;
 };
 
-export const fetchProtectedData = async (
-  url: string,
+export const apiFetch = async (
+  endpoint: string,
+  options: RequestInit = {},
   retry = true
-): Promise<any> => {
-  let accessToken = localStorage.getItem('accessToken');
+) => {
+  let token = localStorage.getItem('accessToken');
 
-  // 🔁 Try refresh if token missing
-  if (!accessToken) {
-    const refreshed = await refreshToken();
-    accessToken = refreshed?.accessToken;
-
-    if (!accessToken) {
-      throw new Error('Session expired');
-    }
-
-    localStorage.setItem('accessToken', accessToken);
+  if (!token) {
+    const res = await refreshAccessToken();
+    const data = await res.json();
+    token = data?.accessToken ?? data?.data?.accessToken;
+    if (!token) throw new Error('Session expired');
+    localStorage.setItem('accessToken', token);
   }
 
-  const res = await fetch(url, {
-    method: 'GET',
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
     headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
     },
     credentials: 'include',
   });
 
-  // 🔄 Token expired
   if (res.status === 401 && retry) {
-    const refreshed = await refreshToken();
+    const refreshRes = await refreshAccessToken();
+    const data = await refreshRes.json();
+    const newToken = data?.accessToken ?? data?.data?.accessToken;
 
-    const newToken = refreshed?.accessToken;
-    if (!newToken) {
-      throw new Error('Session expired');
-    }
-
+    if (!newToken) throw new Error('Session expired');
     localStorage.setItem('accessToken', newToken);
 
-    return fetchProtectedData(url, false); // ⛔ retry only once
-  }
-
-  if (res.status === 404) {
-    throw new Error('Not found');
+    return apiFetch(endpoint, options, false);
   }
 
   if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
+    throw new Error(`API error ${res.status}`);
   }
 
   return res.json();

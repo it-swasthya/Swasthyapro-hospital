@@ -41,10 +41,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import type { Appointment } from "@/app/data/appointment";
-import { getAllAllottedAppointments } from "@/app/services/appointment/appointment.service";
+// import { getAllAllottedAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
-import { fetchProtectedData } from "@/app/services/wrapper/authentication";
+import { apiFetch } from "@/app/services/wrapper/authentication";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -95,9 +95,11 @@ const AppointmentTable = () => {
         // const response = await getAllAllottedAppointments({
         //   hospital_name: "MASHH",
         // });
-        const response = await fetchProtectedData(
-          `https://api.swasthyapro.com/api/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
+        const response = await apiFetch(
+          `/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`
         );
+
+
 
         console.log(response, "response data doctor AND HOSPITAL");
         const mappedData = mapApiAppointmentToUI(response.data);
@@ -385,7 +387,7 @@ const AppointmentTable = () => {
 
                 {/* hospital */}
 
-                   <div className="rounded-lg border p-4">
+                <div className="rounded-lg border p-4">
                   <p className="text-xs text-muted-foreground mb-1">Hospital</p>
                   <p className="text-sm">{selectedAppointment.hospital}</p>
                 </div>
@@ -432,20 +434,20 @@ const AppointmentTable = () => {
                         ) : (
                           <CompletedActions
                             appointmentId={selectedAppointment.id}
-                            onSuccess={(response) => {
+                            onSuccess={(response: { data: any; }) => {
                               const updated = response.data;
 
                               setData((prev) =>
                                 prev.map((apt) =>
                                   apt.id === selectedAppointment.id
                                     ? {
-                                        ...apt,
-                                        status: "Completed",
-                                        diagnosis: updated.diagnosis,
-                                        doctor_advice: updated.doctor_advice,
-                                        prescription_link:
-                                          updated.prescription_link,
-                                      }
+                                      ...apt,
+                                      status: "Completed",
+                                      diagnosis: updated.diagnosis,
+                                      doctor_advice: updated.doctor_advice,
+                                      prescription_link:
+                                        updated.prescription_link,
+                                    }
                                     : apt,
                                 ),
                               );
@@ -453,13 +455,13 @@ const AppointmentTable = () => {
                               setSelectedAppointment((prev) =>
                                 prev
                                   ? {
-                                      ...prev,
-                                      status: "Completed",
-                                      diagnosis: updated.diagnosis,
-                                      doctor_advice: updated.doctor_advice,
-                                      prescription_link:
-                                        updated.prescription_link,
-                                    }
+                                    ...prev,
+                                    status: "Completed",
+                                    diagnosis: updated.diagnosis,
+                                    doctor_advice: updated.doctor_advice,
+                                    prescription_link:
+                                      updated.prescription_link,
+                                  }
                                   : prev,
                               );
                             }}

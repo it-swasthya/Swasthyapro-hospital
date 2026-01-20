@@ -6,6 +6,8 @@ export type AppointmentStatus =
   | "Cancelled"
 
 export type Appointment = {
+  hospital: ReactNode
+  doctor_advice: string
   // appointment_id(arg0: string, appointment_id: any): unknown
   id: string
   patientName: string
