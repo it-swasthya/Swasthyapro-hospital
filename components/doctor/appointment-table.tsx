@@ -56,6 +56,7 @@ import type { Appointment } from "@/app/data/appointment";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
 import { apiFetch } from "@/app/services/wrapper/authentication";
+import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 
 const statusVariant = (status: string) => {
   switch (status) {
