@@ -6,6 +6,7 @@ export const mapApiAppointmentToUI = (
   return apiData.map((item) => ({
     id: item.appointment_id,
     patientName: `${item.User?.first_name ?? ""} ${item.User?.last_name ?? ""}`.trim(),
+    Email: item.User?.email,
     contact: item.User?.contact ?? "—",
     symptoms: item.symptoms ?? "—",
     speciality: item.speciality,

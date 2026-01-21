@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-table";
 
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 
 import {
   AlertDialog,
@@ -57,6 +58,8 @@ import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
 import { apiFetch } from "@/app/services/wrapper/authentication";
 import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
+import AppointmentConfirmDialog from "./appointment/AppointmentConfirmDialog";
+import { ActionResultDialog } from "./appointment/ResultDialog";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -81,10 +84,22 @@ const AppointmentTable = () => {
   const [selectedAppointment, setSelectedAppointment] =
     React.useState<Appointment | null>(null);
 
+  const [resultDialog, setResultDialog] = React.useState<{
+    open: boolean;
+    success: boolean;
+    message: string;
+  }>({
+    open: false,
+    success: true,
+    message: "",
+  });
+
   const [confirmAction, setConfirmAction] = React.useState<{
     type: "accept" | "reject";
     appointment: Appointment | null;
   } | null>(null);
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const statusColorClass = (status: string) => {
     switch (status) {
@@ -104,14 +119,9 @@ const AppointmentTable = () => {
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        // const response = await getAllAllottedAppointments({
-        //   hospital_name: "MASHH",
-        // });
         const response = await apiFetch(
-          `/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`
+          `/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
         );
-
-
 
         console.log(response, "response data doctor AND HOSPITAL");
         const mappedData = mapApiAppointmentToUI(response.data);
@@ -199,7 +209,7 @@ const AppointmentTable = () => {
         accessorKey: "timeSlot",
         header: "Time Slot",
       },
-        {
+      {
         accessorKey: "speciality",
         header: "Speciality",
       },
@@ -258,7 +268,8 @@ const AppointmentTable = () => {
     ============================ */
   if (loading) {
     return (
-      <div className="rounded-md border p-6 text-center text-muted-foreground">
+      <div className="flex items-center justify-center h-64 gap-2 text-muted-foreground">
+        <Spinner className="h-5 w-5" />
         Loading appointments...
       </div>
     );
@@ -400,12 +411,12 @@ const AppointmentTable = () => {
                   <p className="text-sm">{selectedAppointment.symptoms}</p>
                 </div>
 
-
                 <div className="rounded-lg border p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Speciality</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Speciality
+                  </p>
                   <p className="text-sm">{selectedAppointment.speciality}</p>
                 </div>
-
 
                 {/* hospital */}
 
@@ -414,9 +425,7 @@ const AppointmentTable = () => {
                   <p className="text-sm">{selectedAppointment.hospital}</p>
                 </div>
 
-
-
-                {selectedAppointment.status === "Allotted" && (
+                {/* {selectedAppointment.status === "Allotted" && (
                   <div className="flex gap-3">
                     <Button
                       className="flex-1"
@@ -443,6 +452,51 @@ const AppointmentTable = () => {
                       Reject
                     </Button>
                   </div>
+                )} */}
+
+                {selectedAppointment.status === "Allotted" && (
+                  <div className="flex gap-3">
+                    <Button
+                      className="flex-1"
+                      disabled={isSubmitting} // ✅ ADD
+                      onClick={() =>
+                        setConfirmAction({
+                          type: "accept",
+                          appointment: selectedAppointment,
+                        })
+                      }
+                    >
+                      {isSubmitting && confirmAction?.type === "accept" ? (
+                        <span className="flex items-center gap-2">
+                          <Spinner className="h-4 w-4" />
+                          Accepting...
+                        </span>
+                      ) : (
+                        "Accept"
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="destructive"
+                      className="flex-1"
+                      disabled={isSubmitting} // ✅ ADD
+                      onClick={() =>
+                        setConfirmAction({
+                          type: "reject",
+                          appointment: selectedAppointment,
+                        })
+                      }
+                    >
+                      {isSubmitting && confirmAction?.type === "reject" ? (
+                        <span className="flex items-center gap-2">
+                          <Spinner className="h-4 w-4" />
+                          Rejecting...
+                        </span>
+                      ) : (
+                        "Reject"
+                      )}
+                    </Button>
+                  </div>
                 )}
 
                 {selectedAppointment && (
@@ -456,20 +510,20 @@ const AppointmentTable = () => {
                         ) : (
                           <CompletedActions
                             appointmentId={selectedAppointment.id}
-                            onSuccess={(response: { data: any; }) => {
+                            onSuccess={(response: { data: any }) => {
                               const updated = response.data;
 
                               setData((prev) =>
                                 prev.map((apt) =>
                                   apt.id === selectedAppointment.id
                                     ? {
-                                      ...apt,
-                                      status: "Completed",
-                                      diagnosis: updated.diagnosis,
-                                      doctor_advice: updated.doctor_advice,
-                                      prescription_link:
-                                        updated.prescription_link,
-                                    }
+                                        ...apt,
+                                        status: "Completed",
+                                        diagnosis: updated.diagnosis,
+                                        doctor_advice: updated.doctor_advice,
+                                        prescription_link:
+                                          updated.prescription_link,
+                                      }
                                     : apt,
                                 ),
                               );
@@ -477,13 +531,13 @@ const AppointmentTable = () => {
                               setSelectedAppointment((prev) =>
                                 prev
                                   ? {
-                                    ...prev,
-                                    status: "Completed",
-                                    diagnosis: updated.diagnosis,
-                                    doctor_advice: updated.doctor_advice,
-                                    prescription_link:
-                                      updated.prescription_link,
-                                  }
+                                      ...prev,
+                                      status: "Completed",
+                                      diagnosis: updated.diagnosis,
+                                      doctor_advice: updated.doctor_advice,
+                                      prescription_link:
+                                        updated.prescription_link,
+                                    }
                                   : prev,
                               );
                             }}
@@ -496,72 +550,148 @@ const AppointmentTable = () => {
               </div>
             )}
 
-              <AlertDialog
+            {/* <AppointmentConfirmDialog
               open={!!confirmAction}
-              onOpenChange={() => setConfirmAction(null)}
-            >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {confirmAction?.type === "accept"
-                      ? "Accept Appointment?"
-                      : "Reject Appointment?"}
-                  </AlertDialogTitle>
+              type={confirmAction?.type as "accept" | "reject"}
+              appointment={confirmAction?.appointment ?? null}
+              onClose={() => setConfirmAction(null)}
+              onConfirm={async () => {
+                if (!confirmAction?.appointment) return;
 
-                  <AlertDialogDescription>
-                    {confirmAction?.type === "accept"
-                      ? "This appointment will be marked as Scheduled."
-                      : "This appointment will be cancelled and highlighted in red."}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
+                setIsSubmitting(true);
 
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                const appointment = confirmAction.appointment;
+                const isAccept = confirmAction.type === "accept";
 
-                  <AlertDialogAction
-                    onClick={async () => {
-                      if (!confirmAction?.appointment) return;
+                try {
+                  await updateAppointmentStatus(
+                    appointment.id,
+                    confirmAction.type,
+                    appointment.doctorName,
+                  );
 
-                      const { id, doctorName } = confirmAction.appointment;
+                  if (isAccept) {
+                    await apiFetch(
+                      "/mail/send-consultation-scheduled-confirmation-appointment",
+                      {
+                        method: "POST",
+                        body: JSON.stringify({
+                          userName: appointment.patientName,
+                          appointment_id: appointment.id,
+                          allotted_doctor: appointment.assignedDoctor,
+                          timeslot: appointment.timeSlot,
+                          BookingDate: appointment.date,
+                          meet_link: "https://meet.google.com/bob-rfcf-xjp",
+                          userEmail: appointment.Email,
+                        }),
+                      },
+                    );
+                  }
 
-                      try {
-                        //  API CALL
-                        await updateAppointmentStatus(
-                          id,
-                          confirmAction.type,
-                          doctorName
-                        );
+                  const newStatus = isAccept ? "Scheduled" : "Cancelled";
 
-                        const newStatus =
-                          confirmAction.type === "accept"
-                            ? "Scheduled"
-                            : "Cancelled";
+                  setData((prev) =>
+                    prev.map((apt) =>
+                      apt.id === appointment.id
+                        ? { ...apt, status: newStatus }
+                        : apt,
+                    ),
+                  );
 
-                        //  Update table
-                        setData((prev) =>
-                          prev.map((apt) =>
-                            apt.id === id ? { ...apt, status: newStatus } : apt
-                          )
-                        );
-                        //  Update sheet
-                        setSelectedAppointment((prev) =>
-                          prev ? { ...prev, status: newStatus } : prev
-                        );
+                  setSelectedAppointment((prev) =>
+                    prev ? { ...prev, status: newStatus } : prev,
+                  );
 
-                        setOpenSheet(false);
-                      } catch (error) {
-                        console.error("Status update failed", error);
-                        // optional: toast.error("Failed to update status")
-                      } finally {
-                        setConfirmAction(null);
-                      }
-                    }}
-                  >
-                    Confirm
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                  setOpenSheet(false);
+                } catch (err) {
+                  console.error("Failed to update appointment", err);
+                } finally {
+                  setIsSubmitting(false);
+                  setConfirmAction(null);
+                }
+              }}
+            /> */}
+
+            <AppointmentConfirmDialog
+              open={!!confirmAction}
+              type={confirmAction?.type as "accept" | "reject"}
+              appointment={confirmAction?.appointment ?? null}
+              loading={isSubmitting} // ✅ ADD THIS
+              onClose={() => {
+                if (!isSubmitting) {
+                  setConfirmAction(null);
+                }
+              }}
+              onConfirm={async () => {
+                if (!confirmAction?.appointment) return;
+
+                setIsSubmitting(true);
+
+                const appointment = confirmAction.appointment;
+                const isAccept = confirmAction.type === "accept";
+
+                try {
+                  await updateAppointmentStatus(
+                    appointment.id,
+                    confirmAction.type,
+                    appointment.doctorName,
+                  );
+
+                  if (isAccept) {
+                    await apiFetch(
+                      "/mail/send-consultation-scheduled-confirmation-appointment",
+                      {
+                        method: "POST",
+                        body: JSON.stringify({
+                          userName: appointment.patientName,
+                          appointment_id: appointment.id,
+                          allotted_doctor: appointment.assignedDoctor,
+                          timeslot: appointment.timeSlot,
+                          BookingDate: appointment.date,
+                          meet_link: "https://meet.google.com/bob-rfcf-xjp",
+                          userEmail: appointment.Email,
+                        }),
+                      },
+                    );
+                  }
+
+                  const newStatus = isAccept ? "Scheduled" : "Cancelled";
+
+                  setData((prev) =>
+                    prev.map((apt) =>
+                      apt.id === appointment.id
+                        ? { ...apt, status: newStatus }
+                        : apt,
+                    ),
+                  );
+
+                  setSelectedAppointment((prev) =>
+                    prev ? { ...prev, status: newStatus } : prev,
+                  );
+
+                  setResultDialog({
+                    open: true,
+                    success: true,
+                    message: isAccept
+                      ? "Appointment accepted and email sent successfully."
+                      : "Appointment rejected successfully.",
+                  });
+
+                  setOpenSheet(false);
+                } catch (err) {
+                  console.error("Failed to update appointment", err);
+
+                  setResultDialog({
+                    open: true,
+                    success: false,
+                    message: "Action completed, but email could not be sent.",
+                  });
+                } finally {
+                  setIsSubmitting(false);
+                  setConfirmAction(null);
+                }
+              }}
+            />
 
             {/* FOOTER */}
             <div className="border-t px-6 py-4">
@@ -575,6 +705,15 @@ const AppointmentTable = () => {
             </div>
           </SheetContent>
         </Sheet>
+
+        <ActionResultDialog
+          open={resultDialog.open}
+          success={resultDialog.success}
+          message={resultDialog.message}
+          onClose={() =>
+            setResultDialog({ open: false, success: true, message: "" })
+          }
+        />
       </div>
     </div>
   );

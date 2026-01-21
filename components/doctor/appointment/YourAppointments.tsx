@@ -57,8 +57,6 @@ import type { Appointment } from "@/app/data/appointment";
 import { getDoctorAllAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { apiFetch } from "@/app/services/wrapper/authentication";
-// import { Input } from "../ui/input";
-// import { fetchProtectedData } from "@/app/services/wrapper/authentication";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -84,7 +82,11 @@ const YourAppointmentTable = () => {
     React.useState<Appointment | null>(null);
 
   const [confirmAction, setConfirmAction] = React.useState<{
-    type: "accept" | "reject";
+    type: "accept" | "reject" | "complete";
+    appointment: Appointment | null;
+  } | null>(null);
+
+  const [completeConfirm, setCompleteConfirm] = React.useState<{
     appointment: Appointment | null;
   } | null>(null);
 
@@ -102,6 +104,8 @@ const YourAppointmentTable = () => {
         return "bg-gray-100 text-gray-700 border-gray-300";
     }
   };
+
+  const normalizeStatus = (status?: string) => status?.trim().toLowerCase();
 
   React.useEffect(() => {
     const loadData = async () => {
@@ -235,6 +239,27 @@ const YourAppointmentTable = () => {
           </Button>
         ),
       },
+      {
+        id: "updateStatus",
+        header: "Update Status",
+        cell: ({ row }) => {
+          const status = normalizeStatus(row.original.status);
+
+          return (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={status !== "scheduled"}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCompleteConfirm({ appointment: row.original });
+              }}
+            >
+            {row?.original?.status === "Completed" ? ".." : "Mark As Completed" }
+            </Button>
+          );
+        },
+      },
     ],
     [],
   );
@@ -341,6 +366,56 @@ const YourAppointmentTable = () => {
         >
           Next
         </Button>
+
+        <AlertDialog
+          open={!!completeConfirm}
+          onOpenChange={() => setCompleteConfirm(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Mark as Completed?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will mark the consultation as completed.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+              <AlertDialogAction
+                onClick={async () => {
+                  if (!completeConfirm?.appointment) return;
+
+                  const apt = completeConfirm.appointment;
+
+                  await updateAppointmentStatus(
+                    apt.id,
+                    "complete", 
+                    apt.doctorName,
+                  );
+
+                  // row update
+                  setData((prev) =>
+                    prev.map((a) =>
+                      a.id === apt.id ? { ...a, status: "Completed" } : a,
+                    ),
+                  );
+
+                  // sheet update
+                  setSelectedAppointment((prev) =>
+                    prev?.id === apt.id
+                      ? { ...prev, status: "Completed" }
+                      : prev,
+                  );
+
+                  setCompleteConfirm(null);
+                }}
+              >
+                Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <Sheet open={openSheet} onOpenChange={setOpenSheet}>
           <SheetContent className="w-[520px] sm:w-[480px] p-0">

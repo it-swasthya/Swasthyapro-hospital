@@ -155,16 +155,65 @@ export const getAllAppointmentDoctorLists = async () => {
   return res.json();
 };
 
+// export const updateAppointmentStatus = async (
+//   appointmentId: string,
+//   action: "accept" | "reject" | "complete",
+//   doctor_allotted: string,
+// ) => {
+//   const apiAction = action === "accept" ? "schedule" : "cancel";
+
+//   const res = await axios.put(
+//     `https://api.swasthyapro.com/api/appointment/consult/user/update-status-appointment/${appointmentId}`,
+//     { action: apiAction, doctor_allotted },
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     },
+//   );
+
+//   return res.data;
+// };
+
+
+
+
+
+/**
+ * UI-level actions
+ * These are used across components safely
+ */
+export type AppointmentAction = "accept" | "reject" | "complete";
+
+/**
+ * API-level action mapping
+ */
+const ACTION_MAP: Record<AppointmentAction, string> = {
+  accept: "schedule",
+  reject: "cancel",
+  complete: "complete",
+};
+
+/**
+ * Update appointment status (Accept / Reject / Complete)
+ */
 export const updateAppointmentStatus = async (
   appointmentId: string,
-  action: "accept" | "reject",
+  action: AppointmentAction,
   doctor_allotted: string,
 ) => {
-  const apiAction = action === "accept" ? "schedule" : "cancel";
+  const apiAction = ACTION_MAP[action];
+
+  if (!apiAction) {
+    throw new Error(`Invalid appointment action: ${action}`);
+  }
 
   const res = await axios.put(
     `https://api.swasthyapro.com/api/appointment/consult/user/update-status-appointment/${appointmentId}`,
-    { action: apiAction, doctor_allotted },
+    {
+      action: apiAction,
+      doctor_allotted,
+    },
     {
       headers: {
         "Content-Type": "application/json",
@@ -174,6 +223,8 @@ export const updateAppointmentStatus = async (
 
   return res.data;
 };
+
+
 
 export const assignDoctor = async (
   appointmentId: string,
