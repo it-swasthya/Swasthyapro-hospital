@@ -49,7 +49,7 @@ export function AppSidebar({
   const handleLogout = () => {
     // 1. Remove token from localStorage
     localStorage.removeItem("accessToken");
-p
+
     // 2. Remove token cookie (middleware reads this)
     document.cookie =
       "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
