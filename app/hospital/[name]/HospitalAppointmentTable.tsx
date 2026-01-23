@@ -261,6 +261,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+
+
 import {
   Select,
   SelectContent,
@@ -363,7 +365,7 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
                         ? {
                             ...item,
                             assignedDoctor: doctorName,
-                            status: "Pending",
+                             status: "Allotted",
                           }
                         : item
                     )
