@@ -5,7 +5,7 @@ export const loginDoctor = async (data: {
   email: string;
   password: string;
 }) => {
-  const res = await api.post("/asdsaxz2424ssdds", data);
+  const res = await api.post("/auth/asdsaxz2424ssdds", data);
 
 
 
@@ -18,13 +18,13 @@ export const loginHospital = async (data: {
   password: string;
   secretKey: string;
 }) => {
-  const res = await api.post("/asdsaxz2424ssdds", data);
+  const res = await api.post("/auth/asdsaxz2424ssdds", data);
   return res.data;
 };
 
 export const logoutUser = async (token: string) => {
   await api.post(
-    "/logout-cookie",
+    "/auth/logout-cookie",
     {},
     {
       headers: {

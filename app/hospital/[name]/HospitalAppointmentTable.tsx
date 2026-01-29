@@ -464,6 +464,10 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
     getPaginationRowModel: getPaginationRowModel(),
   })
 
+  React.useEffect(() => {
+  setTableData(data)
+}, [data])
+
   return (
     <div className="space-y-4 mt-6">
       <div className="rounded-md border">

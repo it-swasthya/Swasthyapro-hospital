@@ -615,6 +615,7 @@ import { apiFetch } from "@/app/services/wrapper/authentication";
 
 import AppointmentDialog from "./appointment/AppointmentDialog";
 import CompletedActions from "./appointment/CompletedActions";
+import { api } from "@/app/lib/api";
 
 /* ============================
    STATUS STYLE
@@ -669,7 +670,11 @@ const AppointmentTable = () => {
 
     const loadData = async () => {
       try {
-        const res = await apiFetch(
+        // const res = await apiFetch(
+        //   "/appointment/consult/doctor/allotted/appointment?hospital_name="
+        // );
+
+         const res = await api.get(
           "/appointment/consult/doctor/allotted/appointment?hospital_name="
         );
 

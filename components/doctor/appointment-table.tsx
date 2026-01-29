@@ -57,6 +57,7 @@ import type { Appointment } from "@/app/data/appointment";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
 import { apiFetch } from "@/app/services/wrapper/authentication";
+import { api } from "@/app/lib/api";
 import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 import AppointmentConfirmDialog from "./appointment/AppointmentConfirmDialog";
 import { ActionResultDialog } from "./appointment/ResultDialog";
@@ -119,8 +120,12 @@ const AppointmentTable = () => {
   React.useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await apiFetch(
-          `/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
+        // const response = await apiFetch(
+        //   `/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
+        // );
+
+         const response = await api.get(
+          `/appointment/consult/doctor/allotted/appointment?hospital_name=SWASTHYAPRO`,
         );
 
         console.log(response, "response data doctor AND HOSPITAL");
@@ -638,7 +643,24 @@ const AppointmentTable = () => {
                   );
 
                   if (isAccept) {
-                    await apiFetch(
+                  //   await apiFetch(
+                  //     "/mail/send-consultation-scheduled-confirmation-appointment",
+                  //     {
+                  //       method: "POST",
+                  //       body: JSON.stringify({
+                  //         userName: appointment.patientName,
+                  //         appointment_id: appointment.id,
+                  //         allotted_doctor: appointment.assignedDoctor,
+                  //         timeslot: appointment.timeSlot,
+                  //         BookingDate: appointment.date,
+                  //         meet_link: "https://meet.google.com/bob-rfcf-xjp",
+                  //         userEmail: appointment.Email,
+                  //       }),
+                  //     },
+                  //   );
+                  // }
+
+                     await api.get(
                       "/mail/send-consultation-scheduled-confirmation-appointment",
                       {
                         method: "POST",
