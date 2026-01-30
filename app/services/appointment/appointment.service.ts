@@ -139,21 +139,21 @@ export const getDoctorAppointments = async (doctorName: string) => {
 //   return response;
 // };
 
-export const getAllAppointmentDoctorLists = async () => {
-  const res = await fetch(`${BASE_URL}/appointment/consult/all-appointment`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
+// export const getAllAppointmentDoctorLists = async () => {
+//   const res = await fetch(`${BASE_URL}/appointment/consult/all-appointment`, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     cache: "no-store",
+//   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch appointments");
-  }
+//   if (!res.ok) {
+//     throw new Error("Failed to fetch appointments");
+//   }
 
-  return res.json();
-};
+//   return res.json();
+// };
 
 // export const updateAppointmentStatus = async (
 //   appointmentId: string,

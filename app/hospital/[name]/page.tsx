@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { api } from "@/app/lib/api";
+import { api } from "@/app/lib/refresh-api";
 import { mapHospitalAppointmentsToUI } from "@/app/utils/mapHospitalAppointments";
 import HospitalAppointmentTable from "./HospitalAppointmentTable";
 

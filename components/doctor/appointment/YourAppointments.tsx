@@ -57,7 +57,8 @@ import type { Appointment } from "@/app/data/appointment";
 import { getDoctorAllAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { apiFetch } from "@/app/services/wrapper/authentication";
-import { api } from "@/app/lib/api";
+import { api } from "@/app/lib/refresh-api";
+import { getActiveUserAppointment } from "@/app/lib/appointment-apis";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -117,12 +118,10 @@ const YourAppointmentTable = () => {
         //   "/appointment/consult/doctor/all/appointment",
         // );
 
-         const response = await api.get(
-          "/appointment/consult/doctor/all/appointment",
-        );
+       const response = await  getActiveUserAppointment();
 
-        console.log(response, "response data doctor");
-        const mappedData = mapApiAppointmentToUI(response?.data);
+       console.log(response , "response ");
+        const mappedData = mapApiAppointmentToUI(response?.data?.data || []);
         setData(mappedData);
       } catch (error) {
         console.error(error);

@@ -26,7 +26,7 @@ import type { Appointment } from "@/app/data/appointment"
 import { getAllAppointmentDoctorLists, updateAppointmentStatus } from "@/app/services/appointment/appointment.service"
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment"
 // import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service"
-import { getActiveUserAppointment } from "@/app/services/appointment/appointment.service"
+import { getActiveUserAppointment } from "@/app/lib/interceptors-api"
 
 
 
@@ -86,7 +86,9 @@ const AllDoctorAppointmentTable = () => {
                     return
                 }
 
-                const res = await getActiveUserAppointment(token)
+                const res = await getActiveUserAppointment();
+
+                console.log(res, "all dcotors ");
 
                 // 👇 map API → UI
                 const mappedData = mapApiAppointmentToUI(res.data)
@@ -222,6 +224,11 @@ const AllDoctorAppointmentTable = () => {
         setAction(null)
         setOpen(false)
     }
+
+
+    React.useEffect(() => {
+        setData(data)
+    }, [data]);
 
 
 

@@ -57,10 +57,11 @@ import type { Appointment } from "@/app/data/appointment";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { Input } from "../ui/input";
 import { apiFetch } from "@/app/services/wrapper/authentication";
-import { api } from "@/app/lib/api";
+import { api } from "@/app/lib/refresh-api";
 import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 import AppointmentConfirmDialog from "./appointment/AppointmentConfirmDialog";
 import { ActionResultDialog } from "./appointment/ResultDialog";
+import { getDoctorAllhospitalAppointedData } from "@/app/lib/appointment-apis";
 
 const statusVariant = (status: string) => {
   switch (status) {
@@ -124,12 +125,13 @@ const AppointmentTable = () => {
         //   `/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
         // );
 
-         const response = await api.get(
-          `/appointment/consult/doctor/allotted/appointment?hospital_name=SWASTHYAPRO`,
-        );
+        const response = await getDoctorAllhospitalAppointedData();
+
 
         console.log(response, "response data doctor AND HOSPITAL");
-        const mappedData = mapApiAppointmentToUI(response.data);
+
+
+        const mappedData = mapApiAppointmentToUI(response?.data?.data || []);
         setData(mappedData);
       } catch (error) {
         console.error(error);
@@ -660,7 +662,7 @@ const AppointmentTable = () => {
                   //   );
                   // }
 
-                     await api.get(
+                     await api.post(
                       "/mail/send-consultation-scheduled-confirmation-appointment",
                       {
                         method: "POST",

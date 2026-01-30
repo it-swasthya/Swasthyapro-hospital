@@ -615,7 +615,8 @@ import { apiFetch } from "@/app/services/wrapper/authentication";
 
 import AppointmentDialog from "./appointment/AppointmentDialog";
 import CompletedActions from "./appointment/CompletedActions";
-import { api } from "@/app/lib/api";
+import { api } from "@/app/lib/refresh-api";
+import { getDoctorAllAppointedData } from "@/app/lib/appointment-apis";
 
 /* ============================
    STATUS STYLE
@@ -674,11 +675,13 @@ const AppointmentTable = () => {
         //   "/appointment/consult/doctor/allotted/appointment?hospital_name="
         // );
 
-         const res = await api.get(
-          "/appointment/consult/doctor/allotted/appointment?hospital_name="
-        );
+         const res = await getDoctorAllAppointedData();
 
-        const mappedData = mapApiAppointmentToUI(res?.data || []);
+        // console.log(res?.data ," response data not hospital name ");
+
+        const mappedData = mapApiAppointmentToUI(res?.data?.data || []);
+
+        console.log(mappedData , "mapped data ");
         if (isMounted) setData(mappedData);
       } catch (error) {
         console.error(error);

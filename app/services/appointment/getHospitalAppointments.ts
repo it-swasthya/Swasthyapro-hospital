@@ -6,7 +6,7 @@
 //     }
 //   )
 
-import  {api}  from "@/app/lib/api";
+import  {api}  from "@/app/lib/refresh-api";
 
 //   if (!res.ok) {
 //     throw new Error("Failed to fetch hospital appointments")

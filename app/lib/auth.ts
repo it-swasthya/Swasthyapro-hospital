@@ -1,4 +1,4 @@
-import { api } from "./api";
+import {api} from "./refresh-api"
 
 
 export const loginDoctor = async (data: {
