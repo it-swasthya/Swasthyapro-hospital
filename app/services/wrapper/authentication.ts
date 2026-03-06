@@ -16,11 +16,11 @@ const refreshAccessToken = async () => {
   return refreshPromise;
 };
 
-export const apiFetch = async (
+export const apiFetch = async <T = any> (
   endpoint: string,
   options: RequestInit = {},
   retry = true
-) => {
+): Promise<T> => {
   let token = localStorage.getItem('accessToken');
 
   if (!token) {

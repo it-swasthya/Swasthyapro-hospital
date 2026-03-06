@@ -230,8 +230,8 @@ export function SupportForm() {
 
           
           <h3 className="mb-2 font-semibold">
-           General Inquiries/Support
-         </h3>
+            General Inquiries/Support
+          </h3>
 
          
           <div className="flex flex-wrap gap-3">

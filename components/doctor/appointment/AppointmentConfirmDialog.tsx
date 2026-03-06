@@ -82,7 +82,7 @@ const AppointmentConfirmDialog = ({
 
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Action</span>
-            <Badge variant={isAccept ? "success" : "destructive"}>
+            <Badge variant={isAccept ? "default" : "destructive"}>
               {isAccept ? "Schedule" : "Cancel"}
             </Badge>
           </div>

@@ -19,6 +19,7 @@ type Props = {
   action: "accept" | "reject" | null;
   selectedAppointment: Appointment | null;
   handleConfirm: () => void;
+  loading: boolean;
 };
 
 export default function AppointmentDialog({

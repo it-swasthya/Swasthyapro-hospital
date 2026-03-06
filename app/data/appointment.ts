@@ -1,4 +1,5 @@
-// import { Appointment } from "@/types/appointment"
+ //import { Appointment } from "@/types/appointment"
+ import { ReactNode } from "react"
 export type AppointmentStatus =
   | "Allotted"
   | "Scheduled"
@@ -19,12 +20,18 @@ export type Appointment = {
   status: AppointmentStatus
   assignedDoctor?: string
   IsAssignedDoctor?:string
+  doctorName?: string
+  Email?:string
   mode: string
   diagnosis?: string 
   advice?: string 
   prescription_link:string
+  meet_link:string
   createdAt: string
 }
+
+
+
 
 
 

@@ -64,7 +64,7 @@ export default function CompletedActions({
         appointmentId,
         diagnosis,
         advice,
-        file,
+        file:file!,
       })
 
       setDialogType("success")

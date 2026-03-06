@@ -298,7 +298,7 @@ const Spinner = () => (
 ============================ */
 const statusVariant = (status: string) => {
   switch (status) {
-    case "Pending":
+    case "Allotted":
       return "warning"
     case "Scheduled":
       return "success"
@@ -419,7 +419,7 @@ const HospitalAppointmentTable = ({ data }: { data: Appointment[] }) => {
             <Badge variant={statusVariant(status) as any}>
               {status}
             </Badge>
-            {status === "Pending" && isLoading && <Spinner />}
+            {status === "Allotted" && isLoading && <Spinner />}
           </div>
         )
       },

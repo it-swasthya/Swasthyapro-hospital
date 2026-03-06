@@ -23,10 +23,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 import type { Appointment } from "@/app/data/appointment"
-import { getAllAppointmentDoctorLists, updateAppointmentStatus } from "@/app/services/appointment/appointment.service"
+import {  updateAppointmentStatus } from "@/app/services/appointment/appointment.service"
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment"
 // import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service"
-import { getActiveUserAppointment } from "@/app/lib/interceptors-api"
+
 
 
 
@@ -43,6 +43,7 @@ import {
 
 } from "@/components/ui/dialog"
 import AppointmentDialog from "./appointment/AppointmentDialog"
+import { getActiveUserAppointment } from "@/app/lib/appointment-apis"
 
 
 /* ============================
@@ -114,8 +115,7 @@ const AllDoctorAppointmentTable = () => {
         try {
             await updateAppointmentStatus(
                 appointmentId,
-                action,
-
+                action as any,
                 "Dr. Ashish Gupta"
             )
 
@@ -311,6 +311,7 @@ const AllDoctorAppointmentTable = () => {
                     action={action}
                     selectedAppointment={selectedAppointment}
                     handleConfirm={handleConfirm}
+                    loading={loading}
                 />
 
 

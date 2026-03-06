@@ -623,7 +623,7 @@ const AppointmentTable = () => {
               open={!!confirmAction}
               type={confirmAction?.type as "accept" | "reject"}
               appointment={confirmAction?.appointment ?? null}
-              loading={isSubmitting} // ✅ ADD THIS
+              loading={isSubmitting} // ADD THIS
               onClose={() => {
                 if (!isSubmitting) {
                   setConfirmAction(null);
@@ -641,7 +641,7 @@ const AppointmentTable = () => {
                   await updateAppointmentStatus(
                     appointment.id,
                     confirmAction.type,
-                    appointment.doctorName,
+                    appointment.doctorName ??  "Dr. Ashish Gupta",
                   );
 
                   if (isAccept) {
@@ -673,7 +673,7 @@ const AppointmentTable = () => {
                           timeslot: appointment.timeSlot,
                           BookingDate: appointment.date,
                           meet_link: "https://meet.google.com/bob-rfcf-xjp",
-                          userEmail: appointment.Email,
+                          userEmail: appointment?.Email ?? "it@swasthyapro.com",
                         }),
                       },
                     );

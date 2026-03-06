@@ -54,7 +54,7 @@ import { Button } from "@/components/ui/button";
 import { updateAppointmentStatus } from "@/app/services/appointment/appointment.service";
 
 import type { Appointment } from "@/app/data/appointment";
-import { getDoctorAllAppointments } from "@/app/services/appointment/appointment.service";
+// import { getDoctorAllAppointments } from "@/app/services/appointment/appointment.service";
 import { mapApiAppointmentToUI } from "@/app/utils/mapAppointment";
 import { apiFetch } from "@/app/services/wrapper/authentication";
 import { api } from "@/app/lib/refresh-api";
@@ -395,7 +395,7 @@ const YourAppointmentTable = () => {
                   await updateAppointmentStatus(
                     apt.id,
                     "complete", 
-                    apt.doctorName,
+                    apt.doctorName ?? "",
                   );
 
                   // row update
@@ -540,7 +540,7 @@ const YourAppointmentTable = () => {
                     </div>
 
                     {/* Google Meet Link */}
-                    {selectedAppointment.meet_link ? (
+                    {selectedAppointment?.meet_link ? (
                       <Button
                         className="w-full"
                         onClick={() =>
@@ -633,7 +633,7 @@ const YourAppointmentTable = () => {
                         await updateAppointmentStatus(
                           id,
                           confirmAction.type,
-                          doctorName,
+                          doctorName ?? "",
                         );
 
                         const newStatus =
