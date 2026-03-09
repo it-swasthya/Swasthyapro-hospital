@@ -1,12 +1,7 @@
-
-
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import type { Appointment } from "@/app/data/appointment";
-
-
 import { doctors } from "@/app/data/doctor";
 
 import {
@@ -21,22 +16,47 @@ import { AppointmentStatusBadge } from "@/components/common/apt-status-badge";
 import { Badge } from "@/components/ui/badge";
 
 import ConfirmationDialog from "../doctor/appointment/ConfirmationDialog";
-//import { getAllAppointmentDoctorLists } from "@/app/lib/appointment-apis";
-
+import { getAllAppointmentDoctorLists } from "@/app/lib/appointment-apis";
 
 const AppointmentTable = () => {
   const [data, setData] = useState<Appointment[]>([]);
-
-  useEffect(()=> {
-     console.log("data ", data);
-  },[])
+  const [loading, setLoading] = useState(true);
 
   // confirmation dialog state
   const [open, setOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
   /**
-   * Assign doctor ONLY (status never changes)
+   * Fetch appointments
+   */
+  useEffect(() => {
+    const loadAppointments = async () => {
+      try {
+        const res = await getAllAppointmentDoctorLists();
+
+        console.log("API Response:", res);
+
+        const apiData: Appointment[] = Array.isArray(res?.data?.data)
+          ? res.data.data
+          : [];
+
+        setData(apiData);
+      } catch (err) {
+        console.error("Failed to load appointments", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAppointments();
+  }, []);
+
+  useEffect(() => {
+    console.log("Appointments Data:", data);
+  }, [data]);
+
+  /**
+   * Confirm doctor assignment
    */
   const confirmAssignDoctor = () => {
     if (selectedRow === null) return;
@@ -57,6 +77,9 @@ const AppointmentTable = () => {
     setSelectedRow(null);
   };
 
+  /**
+   * Table columns
+   */
   const columns = useMemo<MRT_ColumnDef<Appointment>[]>(() => [
     {
       accessorKey: "id",
@@ -89,7 +112,6 @@ const AppointmentTable = () => {
       size: 180,
     },
 
-    /* ================= STATUS ================= */
     {
       accessorKey: "status",
       header: "Status",
@@ -101,8 +123,8 @@ const AppointmentTable = () => {
       ),
     },
 
-    /* ========== NEW COLUMN: DOCTOR ASSIGNED (YES / NO) ========== */
-    {accessorKey:"IsAssignedDoctor",
+    {
+      accessorKey: "isAssignedDoctor",
       header: "Assigned",
       size: 150,
       Cell: ({ row }) => {
@@ -122,7 +144,6 @@ const AppointmentTable = () => {
       },
     },
 
-    /* ================= ASSIGN DOCTOR ================= */
     {
       accessorKey: "assignedDoctor",
       header: "Assigned Doctor",
@@ -151,7 +172,7 @@ const AppointmentTable = () => {
               const updated = [...data];
               updated[row.index] = {
                 ...appointment,
-                assignedDoctor: e.target.value,
+                assignedDoctor: e.target.value as string,
               };
               setData(updated);
             }}
@@ -171,7 +192,6 @@ const AppointmentTable = () => {
       },
     },
 
-    /* ================= ACTION ================= */
     {
       header: "Action",
       size: 120,
@@ -199,9 +219,15 @@ const AppointmentTable = () => {
     },
   ], [data]);
 
+  /**
+   * Table instance
+   */
   const table = useMaterialReactTable({
     columns,
     data,
+    state: {
+      isLoading: loading,
+    },
     enableColumnActions: false,
     enableSorting: true,
     enablePagination: true,
@@ -236,4 +262,3 @@ const AppointmentTable = () => {
 };
 
 export default AppointmentTable;
-

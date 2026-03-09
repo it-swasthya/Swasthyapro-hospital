@@ -14,7 +14,7 @@ export const getActiveUserAppointment = () => {
 }
 
 export const getDoctorAllhospitalAppointedData  = () => {
-    return api.get(`/appointment/consult/doctor/allotted/appointment?hospital_name=SWASTHYAPRO`,
+    return api.get(`/appointment/consult/doctor/allotted/appointment?hospital_name=MASHH`,
             );
 }
 
