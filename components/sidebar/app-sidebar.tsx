@@ -49,6 +49,15 @@ export function AppSidebar({
   const handleLogout = () => {
     // 1. Remove token from localStorage
     localStorage.removeItem("accessToken");
+    if(user.role === "doctor") {
+      localStorage.removeItem("user_doctor_name");
+
+    }
+
+    else{
+      localStorage.removeItem("user_hospital_name")
+    }
+    
 
     // 2. Remove token cookie (middleware reads this)
     document.cookie =

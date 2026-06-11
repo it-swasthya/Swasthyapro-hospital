@@ -6,46 +6,63 @@ import { mapHospitalAppointmentsToUI } from "@/app/utils/mapHospitalAppointments
 import HospitalAppointmentTable from "./[name]/HospitalAppointmentTable";
 import type { Appointment } from "@/app/data/appointment";
 
-export default function HospitalAppointmentsClient({
-  hospitalName,
-}: {
-  hospitalName: string;
-}) {
+export default function HospitalAppointmentsClient() {
+  const [hospitalName, setHospitalName] = useState("");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  console.log(appointments,"appointments dta cgd");
+  useEffect(() => {
+    const storedHospitalName =
+      localStorage.getItem("user_hospital_name") || "";
 
- useEffect(() => {
-  if (!hospitalName) return;
+    setHospitalName(storedHospitalName);
+  }, []);
 
-  const loadData = async () => {
-    try {
-      const res = await api.get(
-        `/appointment/consult/list-appointment/hospital/${hospitalName.toUpperCase()}`
-      );
+  useEffect(() => {
+    if (!hospitalName) return;
 
-      const apiArray = Array.isArray(res?.data?.data) ? res.data.data : [];
+    const loadData = async () => {
+      try {
+        const res = await api.get(
+          `/appointment/consult/list-appointment/hospital/${hospitalName.toUpperCase()}`
+        );
 
-      console.log(apiArray, "api array data ");
+        const apiArray = Array.isArray(
+          res?.data?.data
+        )
+          ? res.data.data
+          : [];
 
-      const mapped = mapHospitalAppointmentsToUI(apiArray);
+        console.log(
+          apiArray,
+          "api array data"
+        );
 
-      setAppointments(mapped);
-    } catch (error) {
-      console.error("Failed to load appointments", error);
-    }
-  };
+        const mapped =
+          mapHospitalAppointmentsToUI(
+            apiArray
+          );
 
-  loadData();
-}, [hospitalName]);
+        setAppointments(mapped);
+      } catch (error) {
+        console.error(
+          "Failed to load appointments",
+          error
+        );
+      }
+    };
+
+    loadData();
+  }, [hospitalName]);
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">
+      <h1 className="mb-4 text-2xl font-semibold">
         {hospitalName} Appointments
       </h1>
 
-      <HospitalAppointmentTable data={appointments} />
+      <HospitalAppointmentTable
+        data={appointments}
+      />
     </div>
   );
 }

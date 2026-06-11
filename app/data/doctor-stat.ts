@@ -4,7 +4,7 @@ export const stats = [
     value: "2350",
     change: "+20.1% from last month",
     changeColor: "text-green-600",
-    icon: "calendar",        // ✅ fixed
+    icon: "calendar",        //  fixed
     iconBg: "bg-indigo-100",
   },
   {
@@ -12,7 +12,7 @@ export const stats = [
     value: "145",
     change: "+180.1% from last month",
     changeColor: "text-green-600",
-    icon: "doctors",         // ✅ fixed
+    icon: "doctors",         //  fixed
     iconBg: "bg-green-100",
   },
   {
@@ -20,7 +20,7 @@ export const stats = [
     value: "89",
     change: "-19% from last month",
     changeColor: "text-red-600",
-    icon: "briefcase",       // ✅ needs to exist
+    icon: "briefcase",       //  needs to exist
     iconBg: "bg-pink-100",
   },
   {
@@ -28,7 +28,7 @@ export const stats = [
     value: "2200",
     change: "+20.1% from last month",
     changeColor: "text-green-600",
-    icon: "dollarsign",      // ✅ needs to exist
+    icon: "dollarsign",      //  needs to exist
     iconBg: "bg-orange-100",
   },
 ]

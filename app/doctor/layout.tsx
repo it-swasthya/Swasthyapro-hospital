@@ -1,13 +1,27 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/sidebar/app-sidebar"
-import { SearchForm } from "@/components/ui/search-form"
-import { doctorSidebarItems } from "../config/doctor-sidebar"
+"use client";
+
+import { useEffect, useState } from "react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SearchForm } from "@/components/ui/search-form";
+import { doctorSidebarItems } from "../config/doctor-sidebar";
 
 export default function DoctorLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
+  const [userName, setUserName] = useState("Doctor");
+
+  useEffect(() => {
+    const storedName =
+      localStorage.getItem("user_doctor_name");
+
+    if (storedName) {
+      setUserName(storedName);
+    }
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -16,43 +30,43 @@ export default function DoctorLayout({
           logoSrc="/logo-header.png"
           menuItems={doctorSidebarItems}
           user={{
-            name: "Dr. Ashish Gupta",
-            role: "General Physician",
+            name: userName,
+            role: "doctor",
             avatar: "https://i.pravatar.cc/100?img=12",
           }}
         />
 
-        {/* Main area */}
+        {/* Main Area */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
-          <header className="flex h-14 items-center justify-between border-b px-6">
-            {/* LEFT SIDE */}
+          <header className="flex h-16 items-center justify-between border-b px-6">
+            {/* Left */}
             <div className="flex items-center gap-3">
               <SidebarTrigger />
 
-              <div className="flex flex-col leading-tight">
-                {/* <span className="text-sm text-muted-foreground">
+              <div className="flex flex-col">
+                <span className="text-sm text-muted-foreground">
                   Welcome
-                </span> */}
-                <h1 className="text-2xl font-semibold">
-                  Welcome <span className="bg-green-200 p-4 rounded-b-3xl">Dr. Ashish Gupta</span>
+                </span>
+
+                <h1 className="text-xl font-semibold">
+                  {userName}
                 </h1>
               </div>
             </div>
 
-            {/* RIGHT SIDE */}
+            {/* Right */}
             <div className="w-70">
               <SearchForm />
             </div>
           </header>
 
-
-          {/* Page content */}
+          {/* Content */}
           <main className="flex-1 w-full p-6">
             {children}
           </main>
         </div>
       </div>
     </SidebarProvider>
-  )
+  );
 }

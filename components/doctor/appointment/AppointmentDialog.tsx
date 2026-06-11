@@ -36,8 +36,8 @@ export default function AppointmentDialog({
 
   useEffect(() => {
     setMounted(true);
-     const doctorName = localStorage.getItem("user_name");
-      setGetDoctorName("Dr. Ashish Gupta");
+     const doctorName = localStorage.getItem("user_doctor_name");
+      setGetDoctorName(doctorName);
     
   }, []);
 

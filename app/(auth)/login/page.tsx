@@ -1,15 +1,29 @@
-import Image from "next/image"
-import LoginTabs from "@/components/auth/LoginTabs"
+import Image from "next/image";
+import Link from "next/link";
+import LoginTabs from "@/components/auth/LoginTabs";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen  flex items-center justify-center bg-muted/40 px-4 ">
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <div className="grid w-full max-w-5xl grid-cols-1 overflow-hidden rounded-2xl bg-background shadow-lg md:grid-cols-2">
-        
+
         {/* LEFT - Login */}
         <div className="p-8 md:p-10">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold">
+             {/* Registration CTA */}
+          <div className="">
+            <p className="mb-3 text-center text-sm text-muted-foreground">
+              Don't have an account?
+            </p>
+
+            <Link
+              href="/register"
+              className="flex w-full items-center justify-center rounded-lg border border-primary bg-primary/5 px-2 py-2 text-sm font-medium text-primary transition hover:bg-primary hover:text-white"
+            >
+              Register as Doctor or Hospital
+            </Link>
+          </div>
+            <h1 className=" mt-3 text-2xl font-bold">
               Welcome Back 👋
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -18,11 +32,12 @@ export default function LoginPage() {
           </div>
 
           <LoginTabs />
+
+         
         </div>
 
         {/* RIGHT - Image */}
         <div className="relative hidden md:block">
-          {/* Background Image */}
           <Image
             src="/image-hospital.png"
             alt="Hospital Dashboard"
@@ -31,10 +46,8 @@ export default function LoginPage() {
             priority
           />
 
-          {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/50" />
 
-          {/* Content */}
           <div className="relative z-10 flex h-full flex-col justify-center p-10 text-white">
             <h2 className="text-3xl font-bold leading-tight">
               SwasthyaPro
@@ -57,5 +70,5 @@ export default function LoginPage() {
 
       </div>
     </div>
-  )
+  );
 }
