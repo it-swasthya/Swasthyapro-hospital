@@ -10,47 +10,49 @@ import { hospitalStats } from "@/app/data/hospital-stat"
 export function DoctorStatsCards() {
   const pathname = usePathname()
 
-  // 🔑 decide which stats to show
   const isDoctorDashboard = pathname.startsWith("/doctor")
-  const activeStats = isDoctorDashboard
-    ? doctorStats
-    : hospitalStats
+  const activeStats = isDoctorDashboard ? doctorStats : hospitalStats
 
   return (
-    <div className="grid w-full grid-cols-1 overflow-hidden rounded-xl border sm:grid-cols-2 lg:grid-cols-4">
-      {activeStats.map((item, index) => {
+    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {activeStats.map((item) => {
         const Icon = CommonIcons[item.icon]
 
         return (
           <Card
             key={item.title}
-            className={`rounded-none border-0 ${
-              index !== activeStats.length - 1
-                ? "lg:border-r"
-                : ""
-            }`}
+            className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/30"
           >
-            <div className="flex items-center justify-between p-6">
+            {/* Decorative gradient blob */}
+            <div
+              className={`absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20 ${item.iconBg}`}
+            />
+
+            <div className="relative flex items-center justify-between">
               {/* Left */}
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">
                   {item.title}
                 </p>
 
-                <p className="text-2xl font-bold">
+                <p className="text-3xl font-bold tracking-tight">
                   {item.value}
                 </p>
 
-                <p className={`text-xs ${item.changeColor}`}>
-                  {item.change}
-                </p>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${item.changeColor} bg-current/10`}
+                  >
+                    {item.change}
+                  </span>
+                </div>
               </div>
 
               {/* Right Icon */}
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-full ${item.iconBg}`}
+                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-sm ring-1 ring-inset ring-black/5 transition-transform duration-300 group-hover:scale-110 ${item.iconBg}`}
               >
-                {Icon && <Icon className="h-5 w-5" />}
+                {Icon && <Icon className="h-6 w-6" />}
               </div>
             </div>
           </Card>

@@ -3,10 +3,25 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function HospitalRegistrationForm() {
   const router = useRouter();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
+  const [dialogTitle, setDialogTitle] = useState("");
+
+  const [dialogDescription, setDialogDescription] = useState("");
+
+  const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -26,7 +41,7 @@ export default function HospitalRegistrationForm() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -34,9 +49,7 @@ export default function HospitalRegistrationForm() {
     }));
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -49,11 +62,8 @@ export default function HospitalRegistrationForm() {
         password: formData.password,
         contact: formData.contact,
         address: formData.address,
-        establishYear: Number(
-          formData.establishYear
-        ),
-        registrationNo:
-          formData.registrationNo,
+        establishYear: Number(formData.establishYear),
+        registrationNo: formData.registrationNo,
         type: formData.type,
         city: formData.city,
         pincode: formData.pincode,
@@ -64,48 +74,81 @@ export default function HospitalRegistrationForm() {
               .map((center) => ({
                 name: center.trim(),
               }))
-              .filter(
-                (center) => center.name
-              )
+              .filter((center) => center.name)
           : [],
       };
 
-      const response =
-        await axios.post(
-          "https://api.swasthyapro.com/api/auth/register-doctor-hospital",
-          payload,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          }
-        );
-
-      alert(
-        response.data?.message ||
-          "Hospital Registered Successfully"
+      const response = await axios.post(
+        "https://api.swasthyapro.com/api/auth/register-doctor-hospital",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
       );
+
+      setDialogTitle("Registration Successful");
+
+      setDialogDescription(
+        response.data?.message || "Registered Successfully",
+      );
+
+      setIsSuccess(true);
+      setDialogOpen(true);
 
       router.push("/login");
     } catch (error: any) {
       console.error(error);
 
-      alert(
-        error?.response?.data
-          ?.message ||
-          "Registration Failed"
+      setDialogTitle("Registration Failed");
+
+      setDialogDescription(
+        error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
       );
+
+      setIsSuccess(false);
+      setDialogOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4"
+    <>
+   <AlertDialog
+      open={dialogOpen}
+      onOpenChange={setDialogOpen}
     >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {dialogTitle}
+          </AlertDialogTitle>
+
+          <AlertDialogDescription>
+            {dialogDescription}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogAction
+            onClick={() => {
+              setDialogOpen(false);
+
+              if (isSuccess) {
+                router.push("/login");
+              }
+            }}
+          >
+            OK
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
         type="text"
         name="fullName"
@@ -179,18 +222,10 @@ export default function HospitalRegistrationForm() {
         onChange={handleChange}
         className="w-full rounded-lg border p-3"
       >
-        <option value="PRIVATE">
-          Private
-        </option>
-        <option value="GOVT">
-          Government
-        </option>
-        <option value="TRUST">
-          Trust
-        </option>
-        <option value="CLINIC">
-          Clinic
-        </option>
+        <option value="PRIVATE">Private</option>
+        <option value="GOVT">Government</option>
+        <option value="TRUST">Trust</option>
+        <option value="CLINIC">Clinic</option>
       </select>
 
       <textarea
@@ -237,10 +272,9 @@ export default function HospitalRegistrationForm() {
         disabled={loading}
         className="w-full rounded-lg bg-primary py-3 font-medium text-white disabled:opacity-50"
       >
-        {loading
-          ? "Registering..."
-          : "Register Hospital"}
+        {loading ? "Registering..." : "Register Hospital"}
       </button>
     </form>
+    </>
   );
 }

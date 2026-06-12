@@ -3,10 +3,14 @@ import type { NextRequest } from "next/server";
 
 export default function middleware(req: NextRequest) {
   const token = req.cookies.get("accessToken")?.value;
+
+  console.log(token ,"token get ????");
   const pathname = req.nextUrl.pathname;
 
-  // Allow login page
-  if (pathname.startsWith("/login")) {
+  // Public routes (NO protection)
+  const publicRoutes = ["/login", "/register"];
+
+  if (publicRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
@@ -23,5 +27,10 @@ export default function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/doctor/:path*", "/hospital/:path*"],
+  matcher: [
+    "/doctor/:path*",
+    "/hospital/:path*",
+    "/login",
+    "/register",
+  ],
 };

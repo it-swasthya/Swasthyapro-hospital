@@ -7,7 +7,7 @@ import HospitalRegistrationForm from "./HospitalRegistrationForm";
 export default function RegistrationTabs() {
   return (
     <Tabs defaultValue="doctor" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-[40%] grid-cols-2">
         <TabsTrigger value="doctor">
           Doctor
         </TabsTrigger>

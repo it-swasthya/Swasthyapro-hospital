@@ -3,9 +3,25 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function DoctorRegistrationForm() {
   const router = useRouter();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [dialogData, setDialogData] = useState({
+    title: "",
+    description: "",
+    isSuccess: false,
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -24,9 +40,7 @@ export default function DoctorRegistrationForm() {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -34,9 +48,7 @@ export default function DoctorRegistrationForm() {
     }));
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -52,11 +64,8 @@ export default function DoctorRegistrationForm() {
         age: Number(formData.age),
         address: formData.address,
         speciality: formData.speciality,
-        registrationNo:
-          formData.registrationNo,
-        experience: Number(
-          formData.experience
-        ),
+        registrationNo: formData.registrationNo,
+        experience: Number(formData.experience),
         hospitals: formData.hospitals
           ? formData.hospitals
               .split(",")
@@ -65,42 +74,84 @@ export default function DoctorRegistrationForm() {
           : [],
       };
 
-      const response =
-        await axios.post(
-          "https://api.swasthyapro.com/api/auth/register-doctor-hospital",
-          payload,
-          {
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-          }
-        );
-
-      alert(
-        response.data?.message ||
-          "Registration Successful"
+      const response = await axios.post(
+        "https://api.swasthyapro.com/api/auth/register-doctor-hospital",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
       );
 
-      router.push("/login");
+      setDialogData({
+        title: "Registration Successful",
+        description:
+          response.data?.message || "Registered Successfully",
+        isSuccess: true,
+      });
+
+      setDialogOpen(true);
+
+      <AlertDialogAction
+        onClick={() => {
+          if (dialogData.isSuccess) {
+            router.push("/login");
+          }
+        }}
+      >
+        OK
+      </AlertDialogAction>;
     } catch (error: any) {
       console.error(error);
 
-      alert(
-        error?.response?.data
-          ?.message ||
-          "Registration Failed"
-      );
+      setDialogData({
+        title: "Registration Failed",
+        description:
+          error?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        isSuccess: false,
+      });
+
+      setDialogOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4"
-    >
+
+    <><AlertDialog
+  open={dialogOpen}
+  onOpenChange={setDialogOpen}
+>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>
+        {dialogData.title}
+      </AlertDialogTitle>
+
+      <AlertDialogDescription>
+        {dialogData.description}
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter>
+      <AlertDialogAction
+        onClick={() => {
+          if (
+            dialogData.isSuccess
+          ) {
+            router.push("/login");
+          }
+        }}
+      >
+        OK
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
         type="text"
         name="fullName"
@@ -157,18 +208,10 @@ export default function DoctorRegistrationForm() {
         className="w-full rounded-lg border p-3"
         required
       >
-        <option value="">
-          Select Gender
-        </option>
-        <option value="Male">
-          Male
-        </option>
-        <option value="Female">
-          Female
-        </option>
-        <option value="Other">
-          Other
-        </option>
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
       </select>
 
       <input
@@ -225,10 +268,9 @@ export default function DoctorRegistrationForm() {
         disabled={loading}
         className="w-full rounded-lg bg-primary py-3 font-medium text-white disabled:opacity-50"
       >
-        {loading
-          ? "Registering..."
-          : "Register as Doctor"}
+        {loading ? "Registering..." : "Register as Doctor"}
       </button>
     </form>
+    </>
   );
 }

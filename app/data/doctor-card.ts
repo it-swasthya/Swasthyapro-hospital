@@ -32,7 +32,7 @@ export const doctorsCardData = [
   },
   {
     id: "DR003",
-    name: "Dr. Amit Patel",
+    name: "Dr. Amrita Patel",
     designation: "Orthopedic Surgeon",
     rating: 4.4,
     availability: "Available",
@@ -42,7 +42,7 @@ export const doctorsCardData = [
   },
   {
     id: "DR004",
-    name: "Dr. Sneha Iyer",
+    name: "Dr. Saurabh Iyer",
     designation: "Neurologist",
     rating: 4.9,
     availability: "On Leave",
@@ -92,7 +92,7 @@ export const doctorsCardData = [
   },
   {
     id: "DR009",
-    name: "Dr. Nitin Kulkarni",
+    name: "Dr. Nikita Kulkarni",
     designation: "Pulmonologist",
     rating: 4.6,
     availability: "Available",
@@ -102,7 +102,7 @@ export const doctorsCardData = [
   },
   {
     id: "DR010",
-    name: "Dr. Kavita Rao",
+    name: "Dr. Karan Rao",
     designation: "Psychiatrist",
     rating: 4.9,
     availability: "Available",

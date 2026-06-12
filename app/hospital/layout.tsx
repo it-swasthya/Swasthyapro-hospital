@@ -11,12 +11,10 @@ export default function HospitalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [hospitalName, setHospitalName] =
-    useState("Hospital");
+  const [hospitalName, setHospitalName] = useState("Hospital");
 
   useEffect(() => {
-    const name =
-      localStorage.getItem("user_hospital_name");
+    const name = localStorage.getItem("user_hospital_name");
 
     if (name) {
       setHospitalName(name);
@@ -33,8 +31,7 @@ export default function HospitalLayout({
           user={{
             name: hospitalName,
             role: "Hospital",
-            avatar:
-              "https://i.pravatar.cc/100?img=10",
+            avatar: "https://i.pravatar.cc/100?img=10",
           }}
         />
 
@@ -45,14 +42,15 @@ export default function HospitalLayout({
             <div className="flex items-center gap-3">
               <SidebarTrigger />
 
-              <div className="flex flex-col leading-tight">
-                <h1 className="text-2xl font-semibold">
-                  Welcome{" "}
-                  <span className="rounded-t-3xl bg-blue-100 p-4">
-                    {hospitalName}
-                  </span>
-                </h1>
-              </div>
+           <div className="flex flex-col leading-tight">
+  <h1 className="lg:text-2xl md:text-xl sm:text-md  font-bold tracking-tight ">
+    Welcome back,{" "}
+    <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase">
+      {hospitalName}
+    </span>
+  </h1>
+ 
+</div>
             </div>
 
             <div className="w-70">
@@ -61,9 +59,7 @@ export default function HospitalLayout({
           </header>
 
           {/* Content */}
-          <main className="flex-1 w-full p-6">
-            {children}
-          </main>
+          <main className="flex-1 w-full p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>

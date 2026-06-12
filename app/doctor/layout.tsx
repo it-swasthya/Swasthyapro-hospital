@@ -14,8 +14,7 @@ export default function DoctorLayout({
   const [userName, setUserName] = useState("Doctor");
 
   useEffect(() => {
-    const storedName =
-      localStorage.getItem("user_doctor_name");
+    const storedName = localStorage.getItem("user_doctor_name");
 
     if (storedName) {
       setUserName(storedName);
@@ -44,13 +43,12 @@ export default function DoctorLayout({
             <div className="flex items-center gap-3">
               <SidebarTrigger />
 
-              <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">
-                  Welcome
-                </span>
-
-                <h1 className="text-xl font-semibold">
-                  {userName}
+              <div className=" hidden sm:flex flex-col leading-tight ">
+                <h1 className="lg:text-2xl md:text-xl sm:text-md  font-bold tracking-tight ">
+                  Welcome back,{" "}
+                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase">
+                    {userName}
+                  </span>
                 </h1>
               </div>
             </div>
@@ -62,9 +60,7 @@ export default function DoctorLayout({
           </header>
 
           {/* Content */}
-          <main className="flex-1 w-full p-6">
-            {children}
-          </main>
+          <main className="flex-1 w-full p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>

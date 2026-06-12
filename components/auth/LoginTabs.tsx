@@ -89,7 +89,7 @@ export default function LoginTabs() {
 
   return (
     <Tabs defaultValue="doctor" className="w-full">
-      <TabsList className="grid grid-cols-2 mb-6">
+      <TabsList className="grid w-[40%] grid-cols-2 mb-6">
         <TabsTrigger value="doctor">Doctor</TabsTrigger>
         <TabsTrigger value="hospital">Hospital</TabsTrigger>
       </TabsList>
