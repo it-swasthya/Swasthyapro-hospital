@@ -42,15 +42,14 @@ export default function HospitalLayout({
             <div className="flex items-center gap-3">
               <SidebarTrigger />
 
-           <div className="flex flex-col leading-tight">
-  <h1 className="lg:text-2xl md:text-xl sm:text-md  font-bold tracking-tight ">
-    Welcome back,{" "}
-    <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase">
-      {hospitalName}
-    </span>
-  </h1>
- 
-</div>
+              <div className="flex flex-col leading-tight">
+                <h1 className="lg:text-2xl md:text-xl sm:text-md  font-bold tracking-tight ">
+                  Welcome back,{" "}
+                  <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent uppercase">
+                    {hospitalName}
+                  </span>
+                </h1>
+              </div>
             </div>
 
             <div className="w-70">

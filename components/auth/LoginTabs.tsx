@@ -50,7 +50,9 @@ export default function LoginTabs() {
 
       // store token
       localStorage.setItem("accessToken", res.accessToken);
+      res.user.role === "doctor" ? localStorage.setItem("user_doctor_id",res.user.id) : "";
       localStorage.setItem("user_doctor_name", res.user.name);
+     
       
      console.log(res.user.name, " set user name ");
       document.cookie = `accessToken=${res.accessToken}; path=/;`;

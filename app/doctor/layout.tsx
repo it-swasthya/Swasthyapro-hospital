@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SearchForm } from "@/components/ui/search-form";
 import { doctorSidebarItems } from "../config/doctor-sidebar";
+import axios from "axios";
 
 export default function DoctorLayout({
   children,
@@ -12,13 +13,50 @@ export default function DoctorLayout({
   children: React.ReactNode;
 }) {
   const [userName, setUserName] = useState("Doctor");
+  const [speciality, setSpeciality] = useState("doctor");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedName = localStorage.getItem("user_doctor_name");
+    const fetchDoctor = async () => {
+      try {
+        const userId = localStorage.getItem("user_doctor_id");
 
-    if (storedName) {
-      setUserName(storedName);
-    }
+        console.log(userId, "id of user ");
+
+        if (!userId) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get(
+          `https://api.swasthyapro.com/api/auth/get-user-id-role-doctor/${userId}`,
+        );
+
+        if (response.data.success) {
+          const { user, doctor } = response.data.data;
+
+          setUserName(`${user.first_name} ${user.last_name}`.trim());
+
+          setSpeciality(doctor.specialty);
+
+          // Update localStorage as well (optional)
+          // localStorage.setItem("user_doctor_name", doctor?.name || "Doctor");
+        }
+      } catch (error) {
+        console.error("Failed to fetch doctor details:", error);
+
+        // Fallback to stored name
+        const storedName = localStorage.getItem("user_doctor_name");
+
+        if (storedName) {
+          setUserName(storedName);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctor();
   }, []);
 
   return (
@@ -30,11 +68,10 @@ export default function DoctorLayout({
           menuItems={doctorSidebarItems}
           user={{
             name: userName,
-            role: "doctor",
+            role: speciality,
             avatar: "https://i.pravatar.cc/100?img=12",
           }}
         />
-
         {/* Main Area */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}

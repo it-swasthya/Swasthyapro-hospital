@@ -18,6 +18,7 @@ export default function RegistrationTabs() {
       </TabsList>
 
       <TabsContent value="doctor" className="mt-6">
+        
         <DoctorRegistrationForm />
       </TabsContent>
 
